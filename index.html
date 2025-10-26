@@ -2,113 +2,53 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resúmenes con Gemini</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
-      background: #f4f6f8;
-    }
-    h1 {
-      text-align: center;
-    }
-    .respuesta {
-      background: white;
-      padding: 15px;
-      margin: 15px 0;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    button {
-      display: block;
-      margin: 20px auto;
-      padding: 10px 20px;
-      border: none;
-      background: #0078ff;
-      color: white;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #005fcc;
-    }
-    textarea {
-      width: 100%;
-      height: 100px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      padding: 10px;
-      font-size: 14px;
-    }
-  </style>
+  <title>Generador de Texto con Google AI Studio</title>
 </head>
 <body>
+  <h1>Generador de Texto con Google AI Studio</h1>
 
-  <h1>Resúmenes generados con Gemini</h1>
-  <p>Introduce el texto que deseas resumir. Gemini generará 5 resúmenes distintos.</p>
+  <textarea id="prompt" rows="4" cols="50" placeholder="Escribe aquí tu instrucción..."></textarea>
+  <br><br>
+  <button onclick="generarTexto()">Generar Párrafo</button>
 
-  <textarea id="textoEntrada" placeholder="Escribe o pega aquí el texto a resumir..."></textarea>
-  <button id="enviarPrompts">Generar Resúmenes</button>
-
-  <div id="contenedorRespuestas"></div>
+  <h2>Resultado:</h2>
+  <p id="resultado"></p>
 
   <script>
-    const PROXY_URL = "https://gemini.carlosrojasgomariz.workers.dev/"; // Tu proxy Gemini
+    // URL del Worker de Cloudflare (proxy seguro)
+    const API_URL = "https://gemini.carlosrojasgomariz.workers.dev/";
 
-    document.getElementById("enviarPrompts").addEventListener("click", async () => {
-      const texto = document.getElementById("textoEntrada").value.trim();
-      const contenedor = document.getElementById("contenedorRespuestas");
+    async function generarTexto() {
+      const prompt = document.getElementById("prompt").value;
 
-      if (!texto) {
-        alert("Por favor, introduce un texto para resumir.");
-        return;
-      }
-
-      contenedor.innerHTML = "<p>Cargando resúmenes...</p>";
-
-      // Creamos 5 prompts diferentes que piden lo mismo (resumir el texto)
-      const prompts = [
-        `Resume el siguiente texto de forma breve:\n\n${texto}`,
-        `Haz un resumen conciso del siguiente texto:\n\n${texto}`,
-        `Elabora un resumen claro y corto de este texto:\n\n${texto}`,
-        `Genera un resumen comprensible y directo del texto:\n\n${texto}`,
-        `Sintetiza el siguiente contenido en pocas líneas:\n\n${texto}`
-      ];
+      const requestBody = {
+        contents: [{ parts: [{ text: prompt }] }]
+      };
 
       try {
-        // Enviar los 5 prompts simultáneamente
-        const respuestas = await Promise.all(
-          prompts.map(async (prompt) => {
-            const response = await fetch(PROXY_URL, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                contents: [{ role: "user", parts: [{ text: prompt }] }]
-              })
-            });
-
-            const data = await response.json();
-            return data?.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar el resumen.";
-          })
-        );
-
-        // Mostrar las 5 respuestas en orden
-        contenedor.innerHTML = "";
-        respuestas.forEach((texto, i) => {
-          const p = document.createElement("p");
-          p.className = "respuesta";
-          p.innerHTML = `<strong>Resumen ${i + 1}:</strong><br>${texto}`;
-          contenedor.appendChild(p);
+        // Llamada al Worker en lugar de la API directa
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(requestBody)
         });
 
-      } catch (error) {
-        contenedor.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
-      }
-    });
-  </script>
+        const data = await response.json();
+        console.log("Respuesta API:", data);
 
+        const resultado =
+          data.candidates?.[0]?.content?.parts?.[0]?.text ||
+          "No se generó texto.";
+
+        document.getElementById("resultado").innerText = resultado;
+
+      } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("resultado").innerText = "Error al generar texto.";
+      }
+    }
+  </script>
 </body>
 </html>
