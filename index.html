@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generador de Texto con Google AI Studio</title>
+</head>
+<body>
+  <h1>Generador de Texto con Google AI Studio</h1>
+
+  <textarea id="prompt" rows="4" cols="50" placeholder="Escribe aquí tu instrucción..."></textarea>
+  <br><br>
+  <button onclick="generarTexto()">Generar Párrafo</button>
+
+  <h2>Resultado:</h2>
+  <p id="resultado"></p>
+
+  <script>
+    // URL del Worker de Cloudflare (proxy seguro)
+    const API_URL = "https://gemini.carlosrojasgomariz.workers.dev/";
+
+    async function generarTexto() {
+      const prompt = document.getElementById("prompt").value;
+
+      const requestBody = {
+        contents: [{ parts: [{ text: prompt }] }]
+      };
+
+      try {
+        // Llamada al Worker en lugar de la API directa
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        const data = await response.json();
+        console.log("Respuesta API:", data);
+
+        const resultado =
+          data.candidates?.[0]?.content?.parts?.[0]?.text ||
+          "No se generó texto.";
+
+        document.getElementById("resultado").innerText = resultado;
+
+      } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("resultado").innerText = "Error al generar texto.";
+      }
+    }
+  </script>
+</body>
+</html>
