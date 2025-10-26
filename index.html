@@ -44,8 +44,10 @@
   <div id="contenedorNoticias"></div>
 
   <script>
-    const PROXY_URL = "https://gemini.carlosrojasgomariz.workers.dev/"; // <--- tu URL de Cloudflare Worker
-    const NEWS_API_KEY = "d74e0743639744d0b7450bf784a0fbdc"; // <-- sustituye por tu clave de NewsAPI
+    // ---------- CONFIGURACIÓN ----------
+    const PROXY_GEMINI = "https://gemini.carlosrojasgomariz.workers.dev/"; // Tu proxy de Gemini
+    const PROXY_NEWSAPI = "https://tuproxynewsapi.workers.dev/"; // Tu nuevo proxy para NewsAPI
+    const NEWS_API_KEY = "d74e0743639744d0b7450bf784a0fbdc"; // NewsAPI
     const NEWS_API_URL = `https://newsapi.org/v2/top-headlines?category=technology&language=es&pageSize=5&apiKey=${NEWS_API_KEY}`;
 
     document.getElementById("obtenerNoticias").addEventListener("click", async () => {
@@ -53,19 +55,19 @@
       contenedor.innerHTML = "<p>Cargando noticias...</p>";
 
       try {
-        // 1️⃣ Obtener las 5 noticias de tecnología
-        const noticiasResp = await fetch(NEWS_API_URL);
+        // 1️⃣ Traer las noticias desde el proxy de NewsAPI
+        const noticiasResp = await fetch(`${PROXY_NEWSAPI}?url=${encodeURIComponent(NEWS_API_URL)}`);
         const noticiasData = await noticiasResp.json();
         const noticias = noticiasData.articles.slice(0, 5);
 
-        contenedor.innerHTML = ""; // limpiar
+        contenedor.innerHTML = ""; // limpiar contenedor
 
-        // 2️⃣ Enviar cada noticia a Gemini a través del proxy
+        // 2️⃣ Enviar cada noticia al proxy de Gemini para resumir
         const respuestas = await Promise.all(
           noticias.map(async (noticia, i) => {
             const prompt = `Resume brevemente la siguiente noticia de tecnología:\n\n${noticia.title}\n\n${noticia.description || ""}\n\n${noticia.content || ""}`;
             
-            const response = await fetch(PROXY_URL, {
+            const response = await fetch(PROXY_GEMINI, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -80,7 +82,7 @@
           })
         );
 
-        // 3️⃣ Mostrar las respuestas en orden en <p>
+        // 3️⃣ Mostrar las respuestas en el contenedor
         respuestas.forEach((r, idx) => {
           const p = document.createElement("p");
           p.className = "noticia";
