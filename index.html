@@ -38,41 +38,44 @@
 </head>
 <body>
 
-  <h1>Top 5 Noticias de Tecnología (Resumen)</h1>
-  <button id="obtenerNoticias">Obtener Resúmenes</button>
+<h1>Top 5 Noticias de Tecnología</h1>
+<button id="obtenerNoticias">Obtener Noticias</button>
+<div id="contenedorNoticias"></div>
 
-  <div id="contenedorNoticias"></div>
+<script>
+const WORKER_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
 
-  <script>
-    const PROXY_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
+document.getElementById("obtenerNoticias").addEventListener("click", async () => {
+  const contenedor = document.getElementById("contenedorNoticias");
+  contenedor.innerHTML = "<p>Cargando noticias...</p>";
 
-    document.getElementById("obtenerNoticias").addEventListener("click", async () => {
-      const contenedor = document.getElementById("contenedorNoticias");
-      contenedor.innerHTML = "<p>Cargando noticias...</p>";
+  try {
+    const res = await fetch(WORKER_URL);
+    if (!res.ok) throw new Error(`Error en el Worker: ${res.status}`);
+    const data = await res.json();
 
-      try {
-        const noticiasResp = await fetch(PROXY_URL);
-        const noticiasData = await noticiasResp.json();
-        const noticias = noticiasData.articles?.slice(0, 5) || [];
+    const noticias = data.articles?.slice(0,5) || [];
+    if (noticias.length === 0) {
+      contenedor.innerHTML = "<p>No se encontraron noticias.</p>";
+      return;
+    }
 
-        if (noticias.length === 0) {
-          contenedor.innerHTML = "<p>No se encontraron noticias o hubo un error.</p>";
-          return;
-        }
-
-        contenedor.innerHTML = "";
-        noticias.forEach((noticia, idx) => {
-          const p = document.createElement("p");
-          p.className = "noticia";
-          p.innerHTML = `<strong>${idx + 1}. <a href="${noticia.url}" target="_blank">${noticia.title}</a></strong><br>${noticia.description || "No hay descripción disponible."}`;
-          contenedor.appendChild(p);
-        });
-
-      } catch (error) {
-        contenedor.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
-      }
+    contenedor.innerHTML = "";
+    noticias.forEach((noticia, i) => {
+      const div = document.createElement("div");
+      div.className = "noticia";
+      div.innerHTML = `
+        <strong>${i+1}. <a href="${noticia.url}" target="_blank">${noticia.title}</a></strong>
+        <p>${noticia.description || "No hay descripción disponible."}</p>
+      `;
+      contenedor.appendChild(div);
     });
-  </script>
+
+  } catch (err) {
+    contenedor.innerHTML = `<p style="color:red;">${err.message}</p>`;
+  }
+});
+</script>
 
 </body>
 </html>
