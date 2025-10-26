@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resúmenes de Noticias Tecnológicas</title>
+  <title>Resúmenes con Gemini</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,7 +13,7 @@
     h1 {
       text-align: center;
     }
-    .noticia {
+    .respuesta {
       background: white;
       padding: 15px;
       margin: 15px 0;
@@ -34,48 +34,81 @@
     button:hover {
       background: #005fcc;
     }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
 
-<h1>Top 5 Noticias de Tecnología</h1>
-<button id="obtenerNoticias">Obtener Noticias</button>
-<div id="contenedorNoticias"></div>
+  <h1>Resúmenes generados con Gemini</h1>
+  <p>Introduce el texto que deseas resumir. Gemini generará 5 resúmenes distintos.</p>
 
-<script>
-const WORKER_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
+  <textarea id="textoEntrada" placeholder="Escribe o pega aquí el texto a resumir..."></textarea>
+  <button id="enviarPrompts">Generar Resúmenes</button>
 
-document.getElementById("obtenerNoticias").addEventListener("click", async () => {
-  const contenedor = document.getElementById("contenedorNoticias");
-  contenedor.innerHTML = "<p>Cargando noticias...</p>";
+  <div id="contenedorRespuestas"></div>
 
-  try {
-    const res = await fetch(WORKER_URL);
-    if (!res.ok) throw new Error(`Error en el Worker: ${res.status}`);
-    const data = await res.json();
+  <script>
+    const PROXY_URL = "https://gemini.carlosrojasgomariz.workers.dev/"; // Tu proxy Gemini
 
-    const noticias = data.articles?.slice(0,5) || [];
-    if (noticias.length === 0) {
-      contenedor.innerHTML = "<p>No se encontraron noticias.</p>";
-      return;
-    }
+    document.getElementById("enviarPrompts").addEventListener("click", async () => {
+      const texto = document.getElementById("textoEntrada").value.trim();
+      const contenedor = document.getElementById("contenedorRespuestas");
 
-    contenedor.innerHTML = "";
-    noticias.forEach((noticia, i) => {
-      const div = document.createElement("div");
-      div.className = "noticia";
-      div.innerHTML = `
-        <strong>${i+1}. <a href="${noticia.url}" target="_blank">${noticia.title}</a></strong>
-        <p>${noticia.description || "No hay descripción disponible."}</p>
-      `;
-      contenedor.appendChild(div);
+      if (!texto) {
+        alert("Por favor, introduce un texto para resumir.");
+        return;
+      }
+
+      contenedor.innerHTML = "<p>Cargando resúmenes...</p>";
+
+      // Creamos 5 prompts diferentes que piden lo mismo (resumir el texto)
+      const prompts = [
+        `Resume el siguiente texto de forma breve:\n\n${texto}`,
+        `Haz un resumen conciso del siguiente texto:\n\n${texto}`,
+        `Elabora un resumen claro y corto de este texto:\n\n${texto}`,
+        `Genera un resumen comprensible y directo del texto:\n\n${texto}`,
+        `Sintetiza el siguiente contenido en pocas líneas:\n\n${texto}`
+      ];
+
+      try {
+        // Enviar los 5 prompts simultáneamente
+        const respuestas = await Promise.all(
+          prompts.map(async (prompt) => {
+            const response = await fetch(PROXY_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ role: "user", parts: [{ text: prompt }] }]
+              })
+            });
+
+            const data = await response.json();
+            return data?.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar el resumen.";
+          })
+        );
+
+        // Mostrar las 5 respuestas en orden
+        contenedor.innerHTML = "";
+        respuestas.forEach((texto, i) => {
+          const p = document.createElement("p");
+          p.className = "respuesta";
+          p.innerHTML = `<strong>Resumen ${i + 1}:</strong><br>${texto}`;
+          contenedor.appendChild(p);
+        });
+
+      } catch (error) {
+        contenedor.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+      }
     });
-
-  } catch (err) {
-    contenedor.innerHTML = `<p style="color:red;">${err.message}</p>`;
-  }
-});
-</script>
+  </script>
 
 </body>
 </html>
