@@ -2,53 +2,97 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Generador de Texto con Google AI Studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resúmenes de noticias tecnológicas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background: #f4f6f8;
+    }
+    h1 {
+      text-align: center;
+    }
+    .noticia {
+      background: white;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      border: none;
+      background: #0078ff;
+      color: white;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #005fcc;
+    }
+  </style>
 </head>
 <body>
-  <h1>Generador de Texto con Google AI Studio</h1>
 
-  <textarea id="prompt" rows="4" cols="50" placeholder="Escribe aquí tu instrucción..."></textarea>
-  <br><br>
-  <button onclick="generarTexto()">Generar Párrafo</button>
+  <h1>Top 5 Noticias de Tecnología (Resumen)</h1>
+  <button id="obtenerNoticias">Obtener Resúmenes</button>
 
-  <h2>Resultado:</h2>
-  <p id="resultado"></p>
+  <div id="contenedorNoticias"></div>
 
   <script>
-    // URL del Worker de Cloudflare (proxy seguro)
-    const API_URL = "https://gemini.carlosrojasgomariz.workers.dev/";
+    const PROXY_URL = "https://gemini.carlosrojasgomariz.workers.dev/"; // <--- tu URL de Cloudflare Worker
+    const NEWS_API_KEY = "d74e0743639744d0b7450bf784a0fbdc"; // <-- sustituye por tu clave de NewsAPI
+    const NEWS_API_URL = `https://newsapi.org/v2/top-headlines?category=technology&language=es&pageSize=5&apiKey=${NEWS_API_KEY}`;
 
-    async function generarTexto() {
-      const prompt = document.getElementById("prompt").value;
-
-      const requestBody = {
-        contents: [{ parts: [{ text: prompt }] }]
-      };
+    document.getElementById("obtenerNoticias").addEventListener("click", async () => {
+      const contenedor = document.getElementById("contenedorNoticias");
+      contenedor.innerHTML = "<p>Cargando noticias...</p>";
 
       try {
-        // Llamada al Worker en lugar de la API directa
-        const response = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(requestBody)
+        // 1️⃣ Obtener las 5 noticias de tecnología
+        const noticiasResp = await fetch(NEWS_API_URL);
+        const noticiasData = await noticiasResp.json();
+        const noticias = noticiasData.articles.slice(0, 5);
+
+        contenedor.innerHTML = ""; // limpiar
+
+        // 2️⃣ Enviar cada noticia a Gemini a través del proxy
+        const respuestas = await Promise.all(
+          noticias.map(async (noticia, i) => {
+            const prompt = `Resume brevemente la siguiente noticia de tecnología:\n\n${noticia.title}\n\n${noticia.description || ""}\n\n${noticia.content || ""}`;
+            
+            const response = await fetch(PROXY_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ role: "user", parts: [{ text: prompt }] }]
+              })
+            });
+
+            const data = await response.json();
+            const resumen = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No se pudo generar resumen.";
+
+            return { resumen, titulo: noticia.title, url: noticia.url };
+          })
+        );
+
+        // 3️⃣ Mostrar las respuestas en orden en <p>
+        respuestas.forEach((r, idx) => {
+          const p = document.createElement("p");
+          p.className = "noticia";
+          p.innerHTML = `<strong>${idx + 1}. <a href="${r.url}" target="_blank">${r.titulo}</a></strong><br>${r.resumen}`;
+          contenedor.appendChild(p);
         });
 
-        const data = await response.json();
-        console.log("Respuesta API:", data);
-
-        const resultado =
-          data.candidates?.[0]?.content?.parts?.[0]?.text ||
-          "No se generó texto.";
-
-        document.getElementById("resultado").innerText = resultado;
-
       } catch (error) {
-        console.error("Error:", error);
-        document.getElementById("resultado").innerText = "Error al generar texto.";
+        contenedor.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
       }
-    }
+    });
   </script>
+
 </body>
 </html>
