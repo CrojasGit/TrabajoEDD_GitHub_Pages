@@ -10,62 +10,149 @@
       background-color: #f4f4f9;
       color: #333;
     }
+
     h1 {
       text-align: center;
     }
+
+    #adminPanel {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #adminButton {
+      background-color: #333;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #adminButton:hover {
+      background-color: #555;
+    }
+
+    #passwordInput {
+      display: none;
+      margin-top: 10px;
+    }
+
     #noticias {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 20px;
       margin-top: 30px;
     }
+
     .noticia {
       background: white;
       padding: 15px;
       border-radius: 12px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      position: relative;
     }
+
     .noticia img {
       max-width: 100%;
       border-radius: 10px;
     }
+
     .titulo {
       font-weight: bold;
       font-size: 18px;
       margin: 10px 0;
     }
+
     .descripcion {
       color: #555;
     }
+
     .resumen {
       margin-top: 10px;
       font-style: italic;
       color: #444;
     }
+
     .enlace {
       display: inline-block;
       margin-top: 10px;
       color: #0077cc;
       text-decoration: none;
     }
+
     .enlace:hover {
       text-decoration: underline;
+    }
+
+    .regenerar-btn {
+      display: none;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: orange;
+      color: white;
+      border: none;
+      padding: 5px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .regenerar-btn:hover {
+      background-color: #e68900;
     }
   </style>
 </head>
 <body>
   <h1>Últimas noticias de tecnología (con resumen IA)</h1>
 
+  <div id="adminPanel">
+    <button id="adminButton">Modo Admin</button>
+    <div id="passwordInput">
+      <input type="password" id="adminPass" placeholder="Introduce contraseña">
+      <button id="loginButton">Entrar</button>
+    </div>
+  </div>
+
   <div id="noticias">
     <p>Cargando noticias...</p>
   </div>
 
   <script>
-    // URLs de tus Workers (ajusta los dominios reales)
+    // === CONFIGURACIÓN ===
     const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
     const GEMINI_API_URL = "https://gemini.carlosrojasgomariz.workers.dev/";
+    const ADMIN_PASSWORD = "durum2025"; // contraseña admin (texto plano de momento)
 
-    // Carga de noticias desde la proxy de NewsAPI
+    let noticiasGlobales = []; // almacena todas las noticias de NewsAPI
+    let noticiasMostradas = []; // índices de noticias ya mostradas
+    let esAdmin = false;
+
+    // === MODO ADMIN ===
+    const adminButton = document.getElementById("adminButton");
+    const passwordDiv = document.getElementById("passwordInput");
+    const loginButton = document.getElementById("loginButton");
+
+    adminButton.addEventListener("click", () => {
+      passwordDiv.style.display = passwordDiv.style.display === "none" ? "block" : "none";
+    });
+
+    loginButton.addEventListener("click", () => {
+      const input = document.getElementById("adminPass").value;
+      if (input === ADMIN_PASSWORD) {
+        esAdmin = true;
+        passwordDiv.innerHTML = "<p style='color:green'>Modo admin activado ✅</p>";
+        activarModoAdmin();
+      } else {
+        alert("Contraseña incorrecta");
+      }
+    });
+
+    function activarModoAdmin() {
+      document.querySelectorAll(".regenerar-btn").forEach(btn => btn.style.display = "block");
+    }
+
+    // === CARGA DE NOTICIAS ===
     async function cargarNoticias() {
       try {
         const response = await fetch(NEWS_API_URL, {
@@ -75,34 +162,15 @@
         });
 
         const data = await response.json();
+        noticiasGlobales = data.articles || [];
+
         const contenedor = document.getElementById("noticias");
         contenedor.innerHTML = "";
 
-        const articulos = data.articles?.slice(0, 5) || [];
-        if (articulos.length === 0) {
-          contenedor.innerHTML = "<p>No se encontraron noticias.</p>";
-          return;
-        }
-
-        // Mostrar las noticias y luego pedir los resúmenes
-        for (const articulo of articulos) {
-          const div = document.createElement("div");
-          div.className = "noticia";
-
-          const descripcionBase = articulo.description || "Sin descripción disponible.";
-
-          div.innerHTML = `
-            ${articulo.urlToImage ? `<img src="${articulo.urlToImage}" alt="Imagen de la noticia">` : ""}
-            <div class="titulo">${articulo.title}</div>
-            <div class="descripcion">${descripcionBase}</div>
-            <div class="resumen"><em>Generando resumen...</em></div>
-            <a class="enlace" href="${articulo.url}" target="_blank">Leer más</a>
-          `;
-
-          contenedor.appendChild(div);
-
-          // Llamada a Gemini para obtener resumen
-          generarResumen(descripcionBase, div.querySelector(".resumen"));
+        // Tomamos las primeras 5 no repetidas
+        for (let i = 0; i < 5 && i < noticiasGlobales.length; i++) {
+          mostrarNoticia(noticiasGlobales[i], i);
+          noticiasMostradas.push(i);
         }
 
       } catch (error) {
@@ -111,7 +179,30 @@
       }
     }
 
-    // Genera resumen con Gemini
+    // === MUESTRA UNA NOTICIA ===
+    function mostrarNoticia(articulo, indice) {
+      const contenedor = document.getElementById("noticias");
+
+      const div = document.createElement("div");
+      div.className = "noticia";
+      div.dataset.indice = indice;
+
+      const descripcionBase = articulo.description || "Sin descripción disponible.";
+
+      div.innerHTML = `
+        ${articulo.urlToImage ? `<img src="${articulo.urlToImage}" alt="Imagen de la noticia">` : ""}
+        <div class="titulo">${articulo.title}</div>
+        <div class="descripcion">${descripcionBase}</div>
+        <div class="resumen"><em>Generando resumen...</em></div>
+        <a class="enlace" href="${articulo.url}" target="_blank">Leer más</a>
+        <button class="regenerar-btn" onclick="regenerarNoticia(${indice}, this)">Regenerar</button>
+      `;
+
+      contenedor.appendChild(div);
+      generarResumen(descripcionBase, div.querySelector(".resumen"));
+    }
+
+    // === GENERA RESUMEN CON GEMINI ===
     async function generarResumen(textoOriginal, elementoDestino) {
       try {
         const prompt = `Resume brevemente el siguiente texto de una noticia tecnológica en español, de forma natural y clara:\n\n${textoOriginal}`;
@@ -130,14 +221,48 @@
         const resumen = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
         elementoDestino.textContent = resumen || "No se pudo generar el resumen.";
-
       } catch (error) {
         console.error("Error al resumir:", error);
         elementoDestino.textContent = "Error al generar resumen.";
       }
     }
 
-    // Ejecutar al cargar la página
+    // === REGENERAR UNA NOTICIA ===
+    async function regenerarNoticia(indiceActual, boton) {
+      if (!esAdmin) return alert("Solo el admin puede regenerar noticias.");
+
+      // Buscar la siguiente noticia no mostrada
+      const siguienteIndice = noticiasMostradas.length;
+      const siguienteNoticia = noticiasGlobales[siguienteIndice];
+
+      if (!siguienteNoticia) {
+        alert("No hay más noticias disponibles para regenerar.");
+        return;
+      }
+
+      noticiasMostradas.push(siguienteIndice);
+
+      const div = boton.closest(".noticia");
+      div.querySelector(".titulo").textContent = siguienteNoticia.title;
+      div.querySelector(".descripcion").textContent = siguienteNoticia.description || "Sin descripción disponible.";
+      if (siguienteNoticia.urlToImage) {
+        let img = div.querySelector("img");
+        if (!img) {
+          img = document.createElement("img");
+          div.prepend(img);
+        }
+        img.src = siguienteNoticia.urlToImage;
+      }
+      const enlace = div.querySelector(".enlace");
+      enlace.href = siguienteNoticia.url;
+      enlace.textContent = "Leer más";
+
+      const resumenDiv = div.querySelector(".resumen");
+      resumenDiv.innerHTML = "<em>Generando nuevo resumen...</em>";
+      generarResumen(siguienteNoticia.description || "", resumenDiv);
+    }
+
+    // === INICIO ===
     cargarNoticias();
   </script>
 </body>
