@@ -2,13 +2,30 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Noticias Tecnología (10 preparadas, 5 activas)</title>
+  <title>Noticias Tecnología (10 preparadas, 5 visibles)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 30px; background:#f4f4f9; color:#333; }
-    h1 { text-align:center; }
-    #adminPanel { text-align:center; margin-bottom:20px; }
-    #adminButton { background:#333; color:#fff; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background:#f4f4f9;
+      color:#333;
+    }
+    h1 {
+      text-align:center;
+    }
+    #adminPanel {
+      text-align:center;
+      margin-bottom:20px;
+    }
+    #adminButton {
+      background:#333;
+      color:#fff;
+      border:none;
+      padding:10px 15px;
+      border-radius:8px;
+      cursor:pointer;
+    }
     #adminButton:hover { background:#555; }
     #passwordInput { display:none; margin-top:10px; }
     #noticias {
@@ -18,21 +35,45 @@
       margin-top:30px;
     }
     .noticia {
-      background:#fff; padding:15px; border-radius:12px; box-shadow:0 0 8px rgba(0,0,0,0.1);
-      position:relative; min-height:170px;
+      background:#fff;
+      padding:15px;
+      border-radius:12px;
+      box-shadow:0 0 8px rgba(0,0,0,0.1);
+      position:relative;
+      min-height:180px;
+      transition:all 0.3s ease;
     }
-    .noticia img { max-width:100%; border-radius:10px; display:block; margin-bottom:8px; }
+    .noticia img {
+      max-width:100%;
+      border-radius:10px;
+      display:block;
+      margin-bottom:8px;
+    }
     .titulo { font-weight:700; font-size:18px; margin:8px 0; }
     .descripcion { color:#555; }
     .resumen { margin-top:10px; font-style:italic; color:#444; }
-    .enlace { display:inline-block; margin-top:10px; color:#0077cc; text-decoration:none; }
+    .enlace {
+      display:inline-block;
+      margin-top:10px;
+      color:#0077cc;
+      text-decoration:none;
+    }
     .enlace:hover { text-decoration:underline; }
     .regenerar-btn {
       display:none;
-      position:absolute; top:10px; right:10px;
-      background:orange; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer;
+      position:absolute;
+      top:10px;
+      right:10px;
+      background:orange;
+      color:#fff;
+      border:none;
+      padding:6px 10px;
+      border-radius:6px;
+      cursor:pointer;
     }
-    .hidden { display:none; }
+    .hidden {
+      display:none !important;
+    }
   </style>
 </head>
 <body>
@@ -48,7 +89,7 @@
   </div>
 
   <div id="noticias">
-    <!-- 10 contenedores preparados -->
+    <!-- 10 contenedores predefinidos -->
     <div class="noticia" id="n1"></div>
     <div class="noticia" id="n2"></div>
     <div class="noticia" id="n3"></div>
@@ -69,16 +110,15 @@
 
     let noticias = [];
     let esAdmin = false;
-    const MAX_VISIBLE = 5;
-    const MAX_TOTAL = 10;
+    const TOTAL = 10;
+    const VISIBLES = 5;
 
+    // === ELEMENTOS ===
     const adminButton = document.getElementById("adminButton");
     const passwordDiv = document.getElementById("passwordInput");
     const loginButton = document.getElementById("loginButton");
     const adminStatus = document.getElementById("adminStatus");
-    const noticiasCont = document.getElementById("noticias");
 
-    // === ADMIN ===
     adminButton.addEventListener("click", () => {
       passwordDiv.style.display = passwordDiv.style.display === "none" ? "block" : "none";
     });
@@ -100,33 +140,33 @@
         const response = await fetch(NEWS_API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ categoria: "technology", pageSize: MAX_TOTAL })
+          body: JSON.stringify({ categoria: "technology", pageSize: TOTAL })
         });
-
         const data = await response.json();
-        noticias = Array.isArray(data.articles) ? data.articles.slice(0, MAX_TOTAL) : [];
+        noticias = Array.isArray(data.articles) ? data.articles.slice(0, TOTAL) : [];
+
         if (noticias.length === 0) {
-          noticiasCont.innerHTML = "<p>No hay noticias disponibles.</p>";
+          document.getElementById("noticias").innerHTML = "<p>No hay noticias disponibles.</p>";
           return;
         }
 
-        // Rellenar los 10 contenedores con la info
-        for (let i = 0; i < MAX_TOTAL; i++) {
-          const cont = document.getElementById(`n${i+1}`);
+        // rellenar las 10 noticias
+        for (let i = 0; i < TOTAL; i++) {
+          const cont = document.getElementById(`n${i + 1}`);
           const art = noticias[i];
           cont.innerHTML = crearPlantillaNoticia(art, i);
           const resumenDiv = cont.querySelector(".resumen");
           generarResumen(getTexto(art), resumenDiv);
 
-          // botón regenerar
           const btn = cont.querySelector(".regenerar-btn");
-          btn.addEventListener("click", () => regenerarNoticia(cont));
+          btn.addEventListener("click", () => regenerarNoticia(i + 1));
         }
-      } catch (err) {
-        console.error("Error al cargar noticias:", err);
+      } catch (error) {
+        console.error("Error al cargar noticias:", error);
       }
     }
 
+    // === CREAR PLANTILLA ===
     function crearPlantillaNoticia(art, index) {
       const img = art.urlToImage ? `<img src="${art.urlToImage}" alt="Imagen">` : "";
       const title = art.title || "Sin título";
@@ -145,8 +185,13 @@
       return art.description || art.content || art.title || "";
     }
 
+    // === GENERAR RESUMEN CON GEMINI ===
     async function generarResumen(texto, destino) {
       try {
+        if (!texto || texto.trim().length === 0) {
+          destino.textContent = "No hay texto para resumir.";
+          return;
+        }
         const prompt = `Resume brevemente el siguiente texto de una noticia tecnológica en español:\n\n${texto}`;
         const resp = await fetch(GEMINI_API_URL, {
           method: "POST",
@@ -156,29 +201,34 @@
         const data = await resp.json();
         const resumen = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
         destino.textContent = resumen || "No se pudo generar resumen.";
-      } catch {
+      } catch (err) {
         destino.textContent = "Error al generar resumen.";
       }
     }
 
-    // === ADMIN: REGENERAR ===
-    function regenerarNoticia(elemento) {
+    // === REGENERAR NOTICIA ===
+    function regenerarNoticia(indice) {
       if (!esAdmin) {
         alert("Solo el admin puede regenerar noticias.");
         return;
       }
-      elemento.classList.add("hidden");
 
-      // Buscar la primera noticia oculta (no visible)
-      const siguiente = Array.from(document.querySelectorAll(".noticia.hidden"))
-        .find(el => el !== elemento);
-      if (siguiente) {
-        siguiente.classList.remove("hidden");
-      } else {
-        alert("No hay más noticias para activar.");
+      const actual = document.getElementById(`n${indice}`);
+      if (!actual) return;
+      actual.remove();
+
+      // encontrar la primera oculta disponible con id > VISIBLES
+      for (let i = VISIBLES + 1; i <= TOTAL; i++) {
+        const sig = document.getElementById(`n${i}`);
+        if (sig && sig.classList.contains("hidden")) {
+          sig.classList.remove("hidden");
+          return;
+        }
       }
+      alert("No hay más noticias para mostrar.");
     }
 
+    // === UTIL ===
     function escapeHtml(str) {
       return String(str)
         .replaceAll("&", "&amp;")
