@@ -3,122 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noticias de Tecnología</title>
+    <title>Noticias de Tecnología - Proxy NewsAPI</title>
     <style>
-        /* Estilos (sin cambios) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            margin: 2rem;
             background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 2rem;
         }
 
         header {
             text-align: center;
             margin-bottom: 2rem;
-            padding: 1rem 0;
-            border-bottom: 2px solid #007bff;
         }
 
         h1 {
-            color: #343a40;
-            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #4361ee;
         }
 
-        .noticia {
+        p {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        .news-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .news-card {
             background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            flex: 1 1 300px;
             padding: 1.5rem;
+            transition: transform 0.3s ease;
         }
 
-        .foto {
-            width: 100%;
-            max-height: 250px;
-            object-fit: cover;
-            border-radius: 8px;
+        .news-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .news-image {
+            height: 200px;
+            overflow: hidden;
+            border-radius: 15px;
             margin-bottom: 1rem;
         }
 
-        h3 {
-            color: #2c3e50;
-            font-weight: 600;
+        .news-image img {
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .news-content {
+            flex: 1;
+        }
+
+        .news-title {
+            font-size: 1.5rem;
             margin-bottom: 0.5rem;
+            color: #2c3e50;
         }
 
-        .parrafo {
+        .news-source {
+            font-size: 0.9rem;
             color: #7f8c8d;
-            font-size: 14px;
+            margin-top: 0.5rem;
+            text-align: right;
         }
 
-        footer {
-            text-align: center;
-            margin-top: 2rem;
-            padding: 1rem 0;
-            border-top: 2px solid #e9ecef;
-            color: #7f8c8d;
+        a {
+            color: #4361ee;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <header>
         <h1>Noticias de Tecnología</h1>
-        <p>Las últimas noticias del mundo tecnológico, actualizadas diariamente.</p>
+        <p>Las últimas noticias del mundo tecnológico, traídas a ti por nuestra proxy NewsAPI.</p>
     </header>
 
-    <div id="noticias-container">
-        <!-- Aquí se mostrarán las noticias -->
+    <div class="news-container" id="newsContainer">
+        <!-- Aquí se cargarán las noticias -->
     </div>
 
-    <footer>
-        &copy; 2024 - Noticias de Tecnología
-    </footer>
-
-    <script>
-        // Función para cargar las noticias (se llamará al cargar la página)
-        async function cargarNoticias() {
-            try {
-                const respuesta = await fetch('/api/noticias'); // Llama a nuestra proxy
-                if (!respuesta.ok) {
-                    throw new Error(`Error en la solicitud: ${respuesta.status}`);
-                }
-                const noticias = await respuesta.json();
-
-                // Mostrar las 5 primeras noticias
-                for (let i = 0; i < Math.min(noticias.length, 5); i++) {
-                    const noticia = noticias[i];
-                    const contenedorNoticia = document.createElement('div');
-                    contenedorNoticia.classList.add('noticia');
-
-                    const imagen = document.createElement('img');
-                    imagen.src = noticia.urlToImage;
-                    imagen.alt = noticia.title;
-                    imagen.classList.add('foto');
-                    contenedorNoticia.appendChild(imagen);
-
-                    const titulo = document.createElement('h3');
-                    titulo.textContent = noticia.title;
-                    contenedorNoticia.appendChild(titulo);
-
-                    const parrafo = document.createElement('p');
-                    parrafo.classList.add('parrafo');
-                    parrafo.innerHTML = noticia.description + '...'; // Mostrar solo una parte del description
-                    contenedorNoticia.appendChild(parrafo);
-
-                    document.getElementById('noticias-container').appendChild(contenedorNoticia);
-                }
-            } catch (error) {
-                console.error('Error al cargar las noticias:', error);
-                // Mostrar un mensaje de error en la página
-                const contenedorError = document.createElement('div');
-                contenedorError.textContent = 'No se pudieron cargar las noticias. Por favor, inténtalo más tarde.';
-                document.getElementById('noticias-container').appendChild(contenedorError);
-            }
-        }
-
-        // Cargar las noticias cuando la página esté completamente cargada
-        window.addEventListener('load', cargarNoticias);
-    </script>
+    <script src="/proxy.js"></script>
 </body>
 </html>
