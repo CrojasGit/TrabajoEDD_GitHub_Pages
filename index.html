@@ -3,108 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noticias de Tecnología - Proxy NewsAPI</title>
+    <title>Noticias de Tecnología</title>
+    <!-- Agrega aquí tu CSS si lo tienes -->
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Estilos básicos para la página */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-            padding: 2rem;
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
         }
-
-        header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            color: #4361ee;
-        }
-
-        p {
-            color: #7f8c8d;
-            font-size: 1rem;
-        }
-
         .news-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 2rem;
-            max-width: 1000px;
-            margin: 0 auto;
+            gap: 20px;
         }
-
-        .news-card {
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            flex: 1 1 300px;
-            padding: 1.5rem;
-            transition: transform 0.3s ease;
+        .news-item {
+            width: calc(33% - 20px);
+            border: 1px solid #ddd;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
-
-        .news-card:hover {
-            transform: translateY(-10px);
-        }
-
-        .news-image {
-            height: 200px;
-            overflow: hidden;
-            border-radius: 15px;
-            margin-bottom: 1rem;
-        }
-
-        .news-image img {
+        .news-item img {
             width: 100%;
-            object-fit: cover;
-        }
-
-        .news-content {
-            flex: 1;
-        }
-
-        .news-title {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: #2c3e50;
-        }
-
-        .news-source {
-            font-size: 0.9rem;
-            color: #7f8c8d;
-            margin-top: 0.5rem;
-            text-align: right;
-        }
-
-        a {
-            color: #4361ee;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Noticias de Tecnología</h1>
-        <p>Las últimas noticias del mundo tecnológico, traídas a ti por nuestra proxy NewsAPI.</p>
-    </header>
-
+    <h1>Últimas Noticias de Tecnología</h1>
     <div class="news-container" id="newsContainer">
-        <!-- Aquí se cargarán las noticias -->
+        <!-- Aquí se insertarán las noticias -->
     </div>
-
-    <script src="/proxy.js"></script>
+    
+    <script>
+        // Script para cargar las noticias desde Cloudflare Workers
+        async function loadNews() {
+            try {
+                const response = await fetch('/api/get-tech-news'); // Endpoint de la API en Cloudflare
+                if (response.ok) {
+                    const data = await response.json();
+                    const newsContainer = document.getElementById('newsContainer');
+                    
+                    // Limitar a las 5 primeras noticias
+                    const limitedNews = data.slice(0, 5);
+                    
+                    limitedNews.forEach(item => {
+                        const newsItem = document.createElement('div');
+                        newsItem.classList.add('news-item');
+                        
+                        // Crear elemento de imagen
+                        let img = document.createElement('img');
+                        img.src = item.imageUrl; // Suponiendo que la API devuelve imageUrl
+                        img.alt = item.title;
+                        newsItem.appendChild(img);
+                        
+                        // Crear título
+                        let title = document.createElement('h2');
+                        title.textContent = item.title;
+                        newsItem.appendChild(title);
+                        
+                        // Crear párrafo
+                        let paragraph = document.createElement('p');
+                        paragraph.textContent = item.description; // Suponiendo que la API devuelve description
+                        newsItem.appendChild(paragraph);
+                        
+                        newsContainer.appendChild(newsItem);
+                    });
+                } else {
+                    console.error('Error al cargar las noticias:', response.status, response.statusText);
+                    const newsContainer = document.getElementById('newsContainer');
+                    newsContainer.innerHTML = '<p>No se pudo cargar las noticias en este momento.</p>';
+                }
+            } catch (error) {
+                console.error('Error al obtener las noticias:', error);
+                const newsContainer = document.getElementById('newsContainer');
+                newsContainer.innerHTML = `<p>Ocurrió un error al obtener las noticias: ${error}</p>`;
+            }
+        }
+        
+        // Cargar noticias cuando se carga la página
+        window.addEventListener('load', loadNews);
+    </script>
 </body>
 </html>
