@@ -2,109 +2,40 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Noticias de Tecnología con Resumen IA</title>
+  <title>Noticias Tecnología (admin swap)</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
-      background-color: #f4f4f9;
-      color: #333;
-    }
-
-    h1 {
-      text-align: center;
-    }
-
-    #adminPanel {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    #adminButton {
-      background-color: #333;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    #adminButton:hover {
-      background-color: #555;
-    }
-
-    #passwordInput {
-      display: none;
-      margin-top: 10px;
-    }
-
+    body { font-family: Arial, sans-serif; margin: 30px; background:#f4f4f9; color:#333; }
+    h1 { text-align:center; }
+    #adminPanel { text-align:center; margin-bottom:20px; }
+    #adminButton { background:#333; color:#fff; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; }
+    #adminButton:hover { background:#555; }
+    #passwordInput { display:none; margin-top:10px; }
     #noticias {
-      display: grid;
+      display:grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin-top: 30px;
+      gap:20px;
+      margin-top:30px;
     }
-
     .noticia {
-      background: white;
-      padding: 15px;
-      border-radius: 12px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-      position: relative;
+      background:#fff; padding:15px; border-radius:12px; box-shadow:0 0 8px rgba(0,0,0,0.1); position:relative;
+      min-height:180px;
     }
-
-    .noticia img {
-      max-width: 100%;
-      border-radius: 10px;
-    }
-
-    .titulo {
-      font-weight: bold;
-      font-size: 18px;
-      margin: 10px 0;
-    }
-
-    .descripcion {
-      color: #555;
-    }
-
-    .resumen {
-      margin-top: 10px;
-      font-style: italic;
-      color: #444;
-    }
-
-    .enlace {
-      display: inline-block;
-      margin-top: 10px;
-      color: #0077cc;
-      text-decoration: none;
-    }
-
-    .enlace:hover {
-      text-decoration: underline;
-    }
-
+    .noticia img { max-width:100%; border-radius:10px; display:block; margin-bottom:8px; }
+    .titulo { font-weight:700; font-size:18px; margin:8px 0; }
+    .descripcion { color:#555; }
+    .resumen { margin-top:10px; font-style:italic; color:#444; }
+    .enlace { display:inline-block; margin-top:10px; color:#0077cc; text-decoration:none; }
+    .enlace:hover { text-decoration:underline; }
     .regenerar-btn {
-      display: none;
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background-color: orange;
-      color: white;
-      border: none;
-      padding: 5px 8px;
-      border-radius: 6px;
-      cursor: pointer;
+      display:none;
+      position:absolute; top:10px; right:10px;
+      background:orange; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer;
     }
-
-    .regenerar-btn:hover {
-      background-color: #e68900;
-    }
+    .badge { position:absolute; left:10px; top:10px; background:#222; color:#fff; padding:4px 8px; border-radius:6px; font-size:12px; }
   </style>
 </head>
 <body>
-  <h1>Últimas noticias de tecnología (con resumen IA)</h1>
+  <h1>Últimas noticias de tecnología (con resúmenes IA)</h1>
 
   <div id="adminPanel">
     <button id="adminButton">Modo Admin</button>
@@ -112,6 +43,7 @@
       <input type="password" id="adminPass" placeholder="Introduce contraseña">
       <button id="loginButton">Entrar</button>
     </div>
+    <div id="adminStatus" style="margin-top:8px"></div>
   </div>
 
   <div id="noticias">
@@ -119,151 +51,219 @@
   </div>
 
   <script>
-    // === CONFIGURACIÓN ===
+    // --- CONFIG ---
     const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
     const GEMINI_API_URL = "https://gemini.carlosrojasgomariz.workers.dev/";
-    const ADMIN_PASSWORD = "durum2025"; // contraseña admin (texto plano de momento)
+    const ADMIN_PASSWORD = "durum2025"; // contraseña en texto plano por ahora
 
-    let noticiasGlobales = []; // almacena todas las noticias de NewsAPI
-    let noticiasMostradas = []; // índices de noticias ya mostradas
+    // Pool y estado
+    let noticiasPool = [];        // array con hasta 10 artículos provenientes del proxy
+    let displaySlots = [0,1,2,3,4]; // para cada slot 0..4 guardamos el índice dentro de noticiasPool
+    let nextPoolIndex = 5;        // siguiente índice disponible en el pool para swaps
     let esAdmin = false;
 
-    // === MODO ADMIN ===
+    // DOM refs
     const adminButton = document.getElementById("adminButton");
     const passwordDiv = document.getElementById("passwordInput");
     const loginButton = document.getElementById("loginButton");
+    const adminStatus = document.getElementById("adminStatus");
+    const noticiasCont = document.getElementById("noticias");
 
+    // --- ADMIN UI ---
     adminButton.addEventListener("click", () => {
       passwordDiv.style.display = passwordDiv.style.display === "none" ? "block" : "none";
     });
 
     loginButton.addEventListener("click", () => {
-      const input = document.getElementById("adminPass").value;
-      if (input === ADMIN_PASSWORD) {
+      const v = document.getElementById("adminPass").value;
+      if (v === ADMIN_PASSWORD) {
         esAdmin = true;
-        passwordDiv.innerHTML = "<p style='color:green'>Modo admin activado ✅</p>";
-        activarModoAdmin();
+        adminStatus.innerHTML = "<span style='color:green'>Admin activo ✅</span>";
+        // mostrar botones regenerar si ya hay tarjetas creadas
+        document.querySelectorAll(".regenerar-btn").forEach(b => b.style.display = "block");
       } else {
         alert("Contraseña incorrecta");
       }
     });
 
-    function activarModoAdmin() {
-      document.querySelectorAll(".regenerar-btn").forEach(btn => btn.style.display = "block");
-    }
-
-    // === CARGA DE NOTICIAS ===
-    async function cargarNoticias() {
+    // --- FETCH NEWS: pedimos hasta 10 (si worker devuelve menos, se usa lo disponible) ---
+    async function fetchNoticiasPool() {
       try {
         const response = await fetch(NEWS_API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ categoria: "technology" })
+          // pedimos category + sugerencia de pageSize; si tu worker no lo respeta, se adapta
+          body: JSON.stringify({ categoria: "technology", pageSize: 10 })
         });
-
         const data = await response.json();
-        noticiasGlobales = data.articles || [];
-
-        const contenedor = document.getElementById("noticias");
-        contenedor.innerHTML = "";
-
-        // Tomamos las primeras 5 no repetidas
-        for (let i = 0; i < 5 && i < noticiasGlobales.length; i++) {
-          mostrarNoticia(noticiasGlobales[i], i);
-          noticiasMostradas.push(i);
+        noticiasPool = Array.isArray(data.articles) ? data.articles.slice(0, 10) : [];
+        if (noticiasPool.length === 0) {
+          noticiasCont.innerHTML = "<p>No se encontraron noticias (pool vacío).</p>";
+          return;
         }
 
-      } catch (error) {
-        console.error("Error:", error);
-        document.getElementById("noticias").innerHTML = "<p>Error al cargar noticias.</p>";
+        // Asegurarnos de que displaySlots apuntan a índices válidos
+        for (let i = 0; i < displaySlots.length; i++) {
+          if (displaySlots[i] >= noticiasPool.length) displaySlots[i] = i < noticiasPool.length ? i : 0;
+        }
+        nextPoolIndex = Math.max(5, Math.min(noticiasPool.length, 5)); // si pool < 5, nextPoolIndex = pool.length
+
+        // Mostrar las 5 primeras lógico: si pool < 5, mostramos las que haya
+        renderAllSlots();
+      } catch (err) {
+        console.error(err);
+        noticiasCont.innerHTML = "<p>Error al cargar noticias.</p>";
       }
     }
 
-    // === MUESTRA UNA NOTICIA ===
-    function mostrarNoticia(articulo, indice) {
-      const contenedor = document.getElementById("noticias");
-
-      const div = document.createElement("div");
-      div.className = "noticia";
-      div.dataset.indice = indice;
-
-      const descripcionBase = articulo.description || "Sin descripción disponible.";
-
-      div.innerHTML = `
-        ${articulo.urlToImage ? `<img src="${articulo.urlToImage}" alt="Imagen de la noticia">` : ""}
-        <div class="titulo">${articulo.title}</div>
-        <div class="descripcion">${descripcionBase}</div>
-        <div class="resumen"><em>Generando resumen...</em></div>
-        <a class="enlace" href="${articulo.url}" target="_blank">Leer más</a>
-        <button class="regenerar-btn" onclick="regenerarNoticia(${indice}, this)">Regenerar</button>
-      `;
-
-      contenedor.appendChild(div);
-      generarResumen(descripcionBase, div.querySelector(".resumen"));
+    // --- Renderizar las 5 tarjetas según displaySlots ---
+    function renderAllSlots() {
+      noticiasCont.innerHTML = "";
+      const slotsToShow = Math.min(5, noticiasPool.length);
+      for (let slot = 0; slot < slotsToShow; slot++) {
+        renderSlot(slot);
+      }
     }
 
-    // === GENERA RESUMEN CON GEMINI ===
+    // --- Obtener texto para resumen: description || content || title ---
+    function getTextoParaResumen(art) {
+      return art.description || art.content || art.title || "";
+    }
+
+    // --- Render de una única tarjeta (slot 0..4) ---
+    function renderSlot(slotIndex) {
+      const poolIndex = displaySlots[slotIndex];
+      const art = noticiasPool[poolIndex];
+      const div = document.createElement("div");
+      div.className = "noticia";
+      div.dataset.slot = slotIndex;
+      div.dataset.poolIndex = poolIndex;
+
+      // badge que indica posición en pool (opcional pero útil)
+      const badge = `<div class="badge">#${poolIndex + 1} / ${noticiasPool.length}</div>`;
+
+      const imgHtml = art.urlToImage ? `<img src="${art.urlToImage}" alt="Imagen">` : "";
+      const descripcionBase = art.description || "Sin descripción disponible.";
+
+      div.innerHTML = `
+        ${badge}
+        ${imgHtml}
+        <div class="titulo">${escapeHtml(art.title || "Sin título")}</div>
+        <div class="descripcion">${escapeHtml(descripcionBase)}</div>
+        <div class="resumen"><em>Generando resumen...</em></div>
+        <a class="enlace" href="${art.url || '#'}" target="_blank">Leer más</a>
+        <button class="regenerar-btn">Regenerar</button>
+      `;
+
+      noticiasCont.appendChild(div);
+
+      // añadir listener para el botón regenerar (no usar onclick inline)
+      const btn = div.querySelector(".regenerar-btn");
+      btn.addEventListener("click", () => reemplazarSlotPorSiguiente(slotIndex));
+
+      // si admin ya activo, mostrar botón
+      if (esAdmin) btn.style.display = "block";
+
+      // pedir resumen
+      const texto = getTextoParaResumen(art);
+      const resumenDiv = div.querySelector(".resumen");
+      generarResumen(texto, resumenDiv);
+    }
+
+    // --- Reemplazar un slot (0..4) por la siguiente noticia disponible en pool (nextPoolIndex) ---
+    function reemplazarSlotPorSiguiente(slotIndex) {
+      if (!esAdmin) { alert("Solo admin puede regenerar."); return; }
+
+      if (nextPoolIndex >= noticiasPool.length) {
+        alert("No hay más noticias disponibles en el pool para reemplazar.");
+        return;
+      }
+
+      // actualizar mapping displaySlots
+      displaySlots[slotIndex] = nextPoolIndex;
+      const nuevoPoolIdx = nextPoolIndex;
+      nextPoolIndex++;
+
+      // encontrar la tarjeta DOM para ese slot y actualizarla (evitamos re-render completo)
+      const tarjeta = document.querySelector(`.noticia[data-slot="${slotIndex}"]`);
+      if (!tarjeta) {
+        // por seguridad, re-render si falla el selector
+        renderAllSlots();
+        return;
+      }
+
+      const art = noticiasPool[nuevoPoolIdx];
+      // imagen
+      if (art.urlToImage) {
+        let img = tarjeta.querySelector("img");
+        if (!img) {
+          img = document.createElement("img");
+          const firstChild = tarjeta.firstChild;
+          tarjeta.insertBefore(img, firstChild); // al principio
+        }
+        img.src = art.urlToImage;
+      } else {
+        const img = tarjeta.querySelector("img");
+        if (img) img.remove();
+      }
+      // badge
+      const badge = tarjeta.querySelector(".badge");
+      if (badge) badge.textContent = `#${nuevoPoolIdx + 1} / ${noticiasPool.length}`;
+
+      // título, descripción, enlace
+      tarjeta.querySelector(".titulo").textContent = art.title || "Sin título";
+      tarjeta.querySelector(".descripcion").textContent = art.description || art.content || "Sin descripción disponible.";
+      const enlace = tarjeta.querySelector(".enlace");
+      enlace.href = art.url || "#";
+
+      // actualizar data attributes
+      tarjeta.dataset.poolIndex = nuevoPoolIdx;
+
+      // generar nuevo resumen
+      const resumenDiv = tarjeta.querySelector(".resumen");
+      resumenDiv.innerHTML = "<em>Generando nuevo resumen...</em>";
+      generarResumen(getTextoParaResumen(art), resumenDiv);
+    }
+
+    // --- Genera resumen con Gemini (proxy) ---
     async function generarResumen(textoOriginal, elementoDestino) {
       try {
+        if (!textoOriginal || textoOriginal.trim().length === 0) {
+          elementoDestino.textContent = "No hay texto para resumir.";
+          return;
+        }
+
         const prompt = `Resume brevemente el siguiente texto de una noticia tecnológica en español, de forma natural y clara:\n\n${textoOriginal}`;
 
-        const body = {
-          contents: [{ parts: [{ text: prompt }] }]
-        };
+        const body = { contents: [{ parts: [{ text: prompt }] }] };
 
-        const response = await fetch(GEMINI_API_URL, {
+        const resp = await fetch(GEMINI_API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)
         });
 
-        const data = await response.json();
+        const data = await resp.json();
         const resumen = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-
         elementoDestino.textContent = resumen || "No se pudo generar el resumen.";
-      } catch (error) {
-        console.error("Error al resumir:", error);
+      } catch (err) {
+        console.error("Error generarResumen:", err);
         elementoDestino.textContent = "Error al generar resumen.";
       }
     }
 
-    // === REGENERAR UNA NOTICIA ===
-    async function regenerarNoticia(indiceActual, boton) {
-      if (!esAdmin) return alert("Solo el admin puede regenerar noticias.");
-
-      // Buscar la siguiente noticia no mostrada
-      const siguienteIndice = noticiasMostradas.length;
-      const siguienteNoticia = noticiasGlobales[siguienteIndice];
-
-      if (!siguienteNoticia) {
-        alert("No hay más noticias disponibles para regenerar.");
-        return;
-      }
-
-      noticiasMostradas.push(siguienteIndice);
-
-      const div = boton.closest(".noticia");
-      div.querySelector(".titulo").textContent = siguienteNoticia.title;
-      div.querySelector(".descripcion").textContent = siguienteNoticia.description || "Sin descripción disponible.";
-      if (siguienteNoticia.urlToImage) {
-        let img = div.querySelector("img");
-        if (!img) {
-          img = document.createElement("img");
-          div.prepend(img);
-        }
-        img.src = siguienteNoticia.urlToImage;
-      }
-      const enlace = div.querySelector(".enlace");
-      enlace.href = siguienteNoticia.url;
-      enlace.textContent = "Leer más";
-
-      const resumenDiv = div.querySelector(".resumen");
-      resumenDiv.innerHTML = "<em>Generando nuevo resumen...</em>";
-      generarResumen(siguienteNoticia.description || "", resumenDiv);
+    // --- Util: escapar HTML simple para seguridad al insertar títulos/descr ---
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    // === INICIO ===
-    cargarNoticias();
+    // --- INICIO ---
+    fetchNoticiasPool();
   </script>
 </body>
 </html>
