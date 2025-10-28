@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Noticias de Tecnología</title>
+  <title>Noticias de Tecnología con Resumen IA</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -37,6 +37,11 @@
     .descripcion {
       color: #555;
     }
+    .resumen {
+      margin-top: 10px;
+      font-style: italic;
+      color: #444;
+    }
     .enlace {
       display: inline-block;
       margin-top: 10px;
@@ -49,54 +54,86 @@
   </style>
 </head>
 <body>
-  <h1>Últimas noticias de tecnología</h1>
+  <h1>Últimas noticias de tecnología (con resumen IA)</h1>
 
   <div id="noticias">
     <p>Cargando noticias...</p>
   </div>
 
   <script>
-    // URL del Worker de Cloudflare (proxy)
-    const API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
+    // URLs de tus Workers (ajusta los dominios reales)
+    const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
+    const GEMINI_API_URL = "https://gemini.carlosrojasgomariz.workers.dev/";
 
+    // Carga de noticias desde la proxy de NewsAPI
     async function cargarNoticias() {
       try {
-        const response = await fetch(API_URL, {
+        const response = await fetch(NEWS_API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ categoria: "technology" })
         });
 
         const data = await response.json();
-        console.log("Respuesta NewsAPI:", data);
-
         const contenedor = document.getElementById("noticias");
         contenedor.innerHTML = "";
 
         const articulos = data.articles?.slice(0, 5) || [];
-
         if (articulos.length === 0) {
           contenedor.innerHTML = "<p>No se encontraron noticias.</p>";
           return;
         }
 
-        articulos.forEach((articulo) => {
+        // Mostrar las noticias y luego pedir los resúmenes
+        for (const articulo of articulos) {
           const div = document.createElement("div");
           div.className = "noticia";
+
+          const descripcionBase = articulo.description || "Sin descripción disponible.";
 
           div.innerHTML = `
             ${articulo.urlToImage ? `<img src="${articulo.urlToImage}" alt="Imagen de la noticia">` : ""}
             <div class="titulo">${articulo.title}</div>
-            <div class="descripcion">${articulo.description || "Sin descripción disponible."}</div>
+            <div class="descripcion">${descripcionBase}</div>
+            <div class="resumen"><em>Generando resumen...</em></div>
             <a class="enlace" href="${articulo.url}" target="_blank">Leer más</a>
           `;
 
           contenedor.appendChild(div);
-        });
+
+          // Llamada a Gemini para obtener resumen
+          generarResumen(descripcionBase, div.querySelector(".resumen"));
+        }
 
       } catch (error) {
         console.error("Error:", error);
         document.getElementById("noticias").innerHTML = "<p>Error al cargar noticias.</p>";
+      }
+    }
+
+    // Genera resumen con Gemini
+    async function generarResumen(textoOriginal, elementoDestino) {
+      try {
+        const prompt = `Resume brevemente el siguiente texto de una noticia tecnológica en español, de forma natural y clara:\n\n${textoOriginal}`;
+
+        const body = {
+          contents: [{ parts: [{ text: prompt }] }]
+        };
+
+        const response = await fetch(GEMINI_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+
+        const data = await response.json();
+        const resumen = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+        elementoDestino.textContent = resumen || "No se pudo generar el resumen.";
+
+      } catch (error) {
+        console.error("Error al resumir:", error);
+        elementoDestino.textContent = "Error al generar resumen.";
       }
     }
 
