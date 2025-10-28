@@ -1,114 +1,124 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Resumen de Noticias de Tecnología con Google AI Studio</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    .news-item { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
-    h1 { color: #3366ff; }
-  </style>
-</head>
-<body>
-
-  <h1>Resumen de Noticias de Tecnología</h1>
-
-  <div id="noticias-container">
-    <!-- Aquí se insertarán las noticias -->
-  </div>
-
-  <script>
-    // API Key de NewsAPI (en texto plano como solicitado)
-    const apiKey = 'd74e0743639744d0b7450bf784a0fbdc';
-
-    async function obtenerNoticias() {
-      try {
-        const response = await fetch(`https://newsapi.org/v2/everything?q=tecnologia&language=es&sortBy=publishedAt&pageSize=5&apiKey=${apiKey}`);
-        const data = await response.json();
-
-        if (data.status !== 'ok') {
-          throw new Error('Error al obtener noticias');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noticias de Tecnología</title>
+    <style>
+        /* Estilos (sin cambios) */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 2rem;
+            background-color: #f5f7fa;
         }
 
-        return data.articles;
-      } catch (error) {
-        console.error('Error:', error);
-        document.getElementById('noticias-container').innerHTML = '<p>No se pudo cargar las noticias.</p>';
-        return [];
-      }
-    }
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem 0;
+            border-bottom: 2px solid #007bff;
+        }
 
-    async function generarResumenNoticia(article) {
-      // URL del Worker de Cloudflare (proxy seguro para Gemini)
-      const API_URL = "https://gemini.carlosrojasgomariz.workers.dev/";
+        h1 {
+            color: #343a40;
+            font-weight: 700;
+        }
 
-      try {
-        const prompt = `Escribe un resumen conciso de la siguiente noticia: ${article.title} - ${article.description || ''}. Limita el resumen a 100 palabras.`;
+        .noticia {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+        }
 
-        const requestBody = {
-          contents: [{ parts: [{ text: prompt }] }],
-        };
+        .foto {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
 
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
+        h3 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
 
-        const data = await response.json();
-        const resumen = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No se pudo generar el resumen.';
+        .parrafo {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
 
-        return {
-          titulo: article.title,
-          resumen: resumen,
-          url: article.url,
-        };
-      } catch (error) {
-        console.error('Error al generar resumen:', error);
-        return {
-          titulo: article.title,
-          resumen: 'No se pudo generar el resumen de esta noticia.',
-          url: '',
-        };
-      }
-    }
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem 0;
+            border-top: 2px solid #e9ecef;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Noticias de Tecnología</h1>
+        <p>Las últimas noticias del mundo tecnológico, actualizadas diariamente.</p>
+    </header>
 
-    async function mostrarNoticias() {
-      const noticias = await obtenerNoticias();
-      const noticiasContainer = document.getElementById('noticias-container');
+    <div id="noticias-container">
+        <!-- Aquí se mostrarán las noticias -->
+    </div>
 
-      if (noticias && noticias.length > 0) {
-        // Crear un array para almacenar las promesas de los resúmenes
-        const resumenPromises = noticias.map(async (article) => await generarResumenNoticia(article));
+    <footer>
+        &copy; 2024 - Noticias de Tecnología
+    </footer>
 
-        // Esperar a que todas las promesas se cumplan
-        const resumenesFinales = await Promise.all(resumenPromises);
+    <script>
+        // Función para cargar las noticias (se llamará al cargar la página)
+        async function cargarNoticias() {
+            try {
+                const respuesta = await fetch('/api/noticias'); // Llama a nuestra proxy
+                if (!respuesta.ok) {
+                    throw new Error(`Error en la solicitud: ${respuesta.status}`);
+                }
+                const noticias = await respuesta.json();
 
-        // Insertar cada noticia en el contenedor
-        resumenesFinales.forEach((noticia) => {
-          const divNoticia = document.createElement('div');
-          divNoticia.classList.add('news-item');
+                // Mostrar las 5 primeras noticias
+                for (let i = 0; i < Math.min(noticias.length, 5); i++) {
+                    const noticia = noticias[i];
+                    const contenedorNoticia = document.createElement('div');
+                    contenedorNoticia.classList.add('noticia');
 
-          const tituloElement = document.createElement('h3');
-          tituloElement.innerHTML = `<a href="${noticia.url}" target="_blank">${noticia.titulo}</a>`;
+                    const imagen = document.createElement('img');
+                    imagen.src = noticia.urlToImage;
+                    imagen.alt = noticia.title;
+                    imagen.classList.add('foto');
+                    contenedorNoticia.appendChild(imagen);
 
-          const resumenElement = document.createElement('p');
-          resumenElement.textContent = noticia.resumen;
+                    const titulo = document.createElement('h3');
+                    titulo.textContent = noticia.title;
+                    contenedorNoticia.appendChild(titulo);
 
-          divNoticia.appendChild(tituloElement);
-          divNoticia.appendChild(resumenElement);
+                    const parrafo = document.createElement('p');
+                    parrafo.classList.add('parrafo');
+                    parrafo.innerHTML = noticia.description + '...'; // Mostrar solo una parte del description
+                    contenedorNoticia.appendChild(parrafo);
 
-          noticiasContainer.appendChild(divNoticia);
-        });
-      } else {
-        noticiasContainer.innerHTML = '<p>No se encontraron noticias de tecnología.</p>';
-      }
-    }
+                    document.getElementById('noticias-container').appendChild(contenedorNoticia);
+                }
+            } catch (error) {
+                console.error('Error al cargar las noticias:', error);
+                // Mostrar un mensaje de error en la página
+                const contenedorError = document.createElement('div');
+                contenedorError.textContent = 'No se pudieron cargar las noticias. Por favor, inténtalo más tarde.';
+                document.getElementById('noticias-container').appendChild(contenedorError);
+            }
+        }
 
-    // Mostrar las noticias al cargar la página
-    window.onload = mostrarNoticias;
-  </script>
+        // Cargar las noticias cuando la página esté completamente cargada
+        window.addEventListener('load', cargarNoticias);
+    </script>
 </body>
 </html>
