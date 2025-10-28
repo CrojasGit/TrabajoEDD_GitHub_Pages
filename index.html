@@ -11,20 +11,11 @@
       background:#f4f4f9;
       color:#333;
     }
-    h1 {
-      text-align:center;
-    }
-    #adminPanel {
-      text-align:center;
-      margin-bottom:20px;
-    }
+    h1 { text-align:center; }
+    #adminPanel { text-align:center; margin-bottom:20px; }
     #adminButton {
-      background:#333;
-      color:#fff;
-      border:none;
-      padding:10px 15px;
-      border-radius:8px;
-      cursor:pointer;
+      background:#333; color:#fff; border:none;
+      padding:10px 15px; border-radius:8px; cursor:pointer;
     }
     #adminButton:hover { background:#555; }
     #passwordInput { display:none; margin-top:10px; }
@@ -71,9 +62,6 @@
       border-radius:6px;
       cursor:pointer;
     }
-    .hidden {
-      display:none !important;
-    }
   </style>
 </head>
 <body>
@@ -89,17 +77,17 @@
   </div>
 
   <div id="noticias">
-    <!-- 10 contenedores predefinidos -->
+    <!-- 10 divs idénticos -->
     <div class="noticia" id="n1"></div>
     <div class="noticia" id="n2"></div>
     <div class="noticia" id="n3"></div>
     <div class="noticia" id="n4"></div>
     <div class="noticia" id="n5"></div>
-    <div class="noticia hidden" id="n6"></div>
-    <div class="noticia hidden" id="n7"></div>
-    <div class="noticia hidden" id="n8"></div>
-    <div class="noticia hidden" id="n9"></div>
-    <div class="noticia hidden" id="n10"></div>
+    <div class="noticia" id="n6" style="display:none"></div>
+    <div class="noticia" id="n7" style="display:none"></div>
+    <div class="noticia" id="n8" style="display:none"></div>
+    <div class="noticia" id="n9" style="display:none"></div>
+    <div class="noticia" id="n10" style="display:none"></div>
   </div>
 
   <script>
@@ -113,7 +101,7 @@
     const TOTAL = 10;
     const VISIBLES = 5;
 
-    // === ELEMENTOS ===
+    // === ADMIN PANEL ===
     const adminButton = document.getElementById("adminButton");
     const passwordDiv = document.getElementById("passwordInput");
     const loginButton = document.getElementById("loginButton");
@@ -150,23 +138,26 @@
           return;
         }
 
-        // rellenar las 10 noticias
+        // Rellenar los 10 contenedores con sus datos
         for (let i = 0; i < TOTAL; i++) {
           const cont = document.getElementById(`n${i + 1}`);
           const art = noticias[i];
           cont.innerHTML = crearPlantillaNoticia(art, i);
+
+          // Generar resumen
           const resumenDiv = cont.querySelector(".resumen");
           generarResumen(getTexto(art), resumenDiv);
 
+          // Botón regenerar
           const btn = cont.querySelector(".regenerar-btn");
           btn.addEventListener("click", () => regenerarNoticia(i + 1));
         }
-      } catch (error) {
-        console.error("Error al cargar noticias:", error);
+      } catch (err) {
+        console.error("Error al cargar noticias:", err);
       }
     }
 
-    // === CREAR PLANTILLA ===
+    // === CREAR PLANTILLA DE NOTICIA ===
     function crearPlantillaNoticia(art, index) {
       const img = art.urlToImage ? `<img src="${art.urlToImage}" alt="Imagen">` : "";
       const title = art.title || "Sin título";
@@ -181,6 +172,7 @@
       `;
     }
 
+    // === TEXTO PARA RESUMIR ===
     function getTexto(art) {
       return art.description || art.content || art.title || "";
     }
@@ -200,7 +192,7 @@
         });
         const data = await resp.json();
         const resumen = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-        destino.textContent = resumen || "No se pudo generar resumen.";
+        destino.textContent = resumen || "No se pudo generar el resumen.";
       } catch (err) {
         destino.textContent = "Error al generar resumen.";
       }
@@ -217,18 +209,19 @@
       if (!actual) return;
       actual.remove();
 
-      // encontrar la primera oculta disponible con id > VISIBLES
+      // Mostrar la siguiente noticia oculta
       for (let i = VISIBLES + 1; i <= TOTAL; i++) {
-        const sig = document.getElementById(`n${i}`);
-        if (sig && sig.classList.contains("hidden")) {
-          sig.classList.remove("hidden");
+        const siguiente = document.getElementById(`n${i}`);
+        if (siguiente && siguiente.style.display === "none") {
+          siguiente.style.display = "block";
           return;
         }
       }
+
       alert("No hay más noticias para mostrar.");
     }
 
-    // === UTIL ===
+    // === UTILIDAD ===
     function escapeHtml(str) {
       return String(str)
         .replaceAll("&", "&amp;")
