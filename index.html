@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Noticias Tecnología (admin swap)</title>
+  <meta charset="utf-8" />
+  <title>Noticias Tecnología (admin swap - mostrar pool oculto)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     body { font-family: Arial, sans-serif; margin: 30px; background:#f4f4f9; color:#333; }
     h1 { text-align:center; }
@@ -17,9 +18,11 @@
       margin-top:30px;
     }
     .noticia {
-      background:#fff; padding:15px; border-radius:12px; box-shadow:0 0 8px rgba(0,0,0,0.1); position:relative;
-      min-height:180px;
+      background:#fff; padding:15px; border-radius:12px; box-shadow:0 0 8px rgba(0,0,0,0.1);
+      position:relative; min-height:170px;
     }
+    .noticia.hidden { display:none; }
+    .noticia.removed { display:none !important; opacity:0.3; }
     .noticia img { max-width:100%; border-radius:10px; display:block; margin-bottom:8px; }
     .titulo { font-weight:700; font-size:18px; margin:8px 0; }
     .descripcion { color:#555; }
@@ -32,6 +35,7 @@
       background:orange; color:#fff; border:none; padding:6px 10px; border-radius:6px; cursor:pointer;
     }
     .badge { position:absolute; left:10px; top:10px; background:#222; color:#fff; padding:4px 8px; border-radius:6px; font-size:12px; }
+    #adminStatus { margin-top:8px; }
   </style>
 </head>
 <body>
@@ -43,7 +47,7 @@
       <input type="password" id="adminPass" placeholder="Introduce contraseña">
       <button id="loginButton">Entrar</button>
     </div>
-    <div id="adminStatus" style="margin-top:8px"></div>
+    <div id="adminStatus"></div>
   </div>
 
   <div id="noticias">
@@ -51,25 +55,26 @@
   </div>
 
   <script>
-    // --- CONFIG ---
+    // ====== CONFIG ======
     const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
     const GEMINI_API_URL = "https://gemini.carlosrojasgomariz.workers.dev/";
-    const ADMIN_PASSWORD = "durum2025"; // contraseña en texto plano por ahora
+    const ADMIN_PASSWORD = "durum2025"; // contraseña en texto plano (temporal)
 
-    // Pool y estado
-    let noticiasPool = [];        // array con hasta 10 artículos provenientes del proxy
-    let displaySlots = [0,1,2,3,4]; // para cada slot 0..4 guardamos el índice dentro de noticiasPool
-    let nextPoolIndex = 5;        // siguiente índice disponible en el pool para swaps
+    // ====== ESTADO ======
+    let noticiasPool = [];         // array con objetos de noticias (pool)
+    let poolElements = [];         // array con elementos DOM creados para cada noticia del pool
     let esAdmin = false;
+    const MAX_VISIBLE = 5;         // número de tarjetas visibles simultáneamente
+    const MAX_POOL = 10;           // tamaño máximo del pool que pedimos
 
-    // DOM refs
+    // ====== DOM ======
     const adminButton = document.getElementById("adminButton");
     const passwordDiv = document.getElementById("passwordInput");
     const loginButton = document.getElementById("loginButton");
     const adminStatus = document.getElementById("adminStatus");
     const noticiasCont = document.getElementById("noticias");
 
-    // --- ADMIN UI ---
+    // ====== ADMIN UI ======
     adminButton.addEventListener("click", () => {
       passwordDiv.style.display = passwordDiv.style.display === "none" ? "block" : "none";
     });
@@ -79,162 +84,177 @@
       if (v === ADMIN_PASSWORD) {
         esAdmin = true;
         adminStatus.innerHTML = "<span style='color:green'>Admin activo ✅</span>";
-        // mostrar botones regenerar si ya hay tarjetas creadas
+        // mostrar botones regenerar
         document.querySelectorAll(".regenerar-btn").forEach(b => b.style.display = "block");
       } else {
         alert("Contraseña incorrecta");
       }
     });
 
-    // --- FETCH NEWS: pedimos hasta 10 (si worker devuelve menos, se usa lo disponible) ---
+    // ====== FETCH: obtener pool de noticias (hasta 10) ======
     async function fetchNoticiasPool() {
+      noticiasCont.innerHTML = "<p>Cargando noticias...</p>";
       try {
         const response = await fetch(NEWS_API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          // pedimos category + sugerencia de pageSize; si tu worker no lo respeta, se adapta
-          body: JSON.stringify({ categoria: "technology", pageSize: 10 })
+          body: JSON.stringify({ categoria: "technology", pageSize: MAX_POOL })
         });
         const data = await response.json();
-        noticiasPool = Array.isArray(data.articles) ? data.articles.slice(0, 10) : [];
+        noticiasPool = Array.isArray(data.articles) ? data.articles.slice(0, MAX_POOL) : [];
+
         if (noticiasPool.length === 0) {
           noticiasCont.innerHTML = "<p>No se encontraron noticias (pool vacío).</p>";
           return;
         }
 
-        // Asegurarnos de que displaySlots apuntan a índices válidos
-        for (let i = 0; i < displaySlots.length; i++) {
-          if (displaySlots[i] >= noticiasPool.length) displaySlots[i] = i < noticiasPool.length ? i : 0;
-        }
-        nextPoolIndex = Math.max(5, Math.min(noticiasPool.length, 5)); // si pool < 5, nextPoolIndex = pool.length
-
-        // Mostrar las 5 primeras lógico: si pool < 5, mostramos las que haya
-        renderAllSlots();
+        buildAllPoolElements();
+        renderInitialVisible();
       } catch (err) {
-        console.error(err);
+        console.error("Error al cargar pool:", err);
         noticiasCont.innerHTML = "<p>Error al cargar noticias.</p>";
       }
     }
 
-    // --- Renderizar las 5 tarjetas según displaySlots ---
-    function renderAllSlots() {
+    // ====== Construir elemento DOM para cada noticia del pool y mantenerlo en poolElements ======
+    function buildAllPoolElements() {
+      poolElements = noticiasPool.map((art, idx) => {
+        const div = document.createElement("div");
+        div.className = "noticia";
+        div.dataset.poolIndex = String(idx);
+        div.dataset.removed = "false"; // marca si fue eliminada por regenerar
+        // Badge (opcional, muestra posición en pool)
+        const badgeHtml = `<div class="badge">#${idx + 1} / ${noticiasPool.length}</div>`;
+        const imgHtml = art.urlToImage ? `<img src="${art.urlToImage}" alt="Imagen noticia">` : "";
+        const desc = art.description || art.content || "Sin descripción disponible.";
+        div.innerHTML = `
+          ${badgeHtml}
+          ${imgHtml}
+          <div class="titulo">${escapeHtml(art.title || "Sin título")}</div>
+          <div class="descripcion">${escapeHtml(desc)}</div>
+          <div class="resumen"><em>Generando resumen...</em></div>
+          <a class="enlace" href="${art.url || '#'}" target="_blank">Leer más</a>
+          <button class="regenerar-btn">Regenerar</button>
+        `;
+        // listener del botón regenerar (usa cierre para saber poolIndex)
+        const btn = div.querySelector(".regenerar-btn");
+        btn.addEventListener("click", () => handleRegenerarOnVisible(idx));
+        // si no es admin, botones ocultos
+        if (!esAdmin) btn.style.display = "none";
+        // generamos el resumen (aunque algunos estarán ocultos)
+        const resumenDiv = div.querySelector(".resumen");
+        generarResumen(getTextoParaResumen(art), resumenDiv);
+        return div;
+      });
+    }
+
+    // ====== Render inicial: insertar en DOM solo las 5 primeras visibles; las demás añadimos pero ocultas ======
+    function renderInitialVisible() {
       noticiasCont.innerHTML = "";
-      const slotsToShow = Math.min(5, noticiasPool.length);
-      for (let slot = 0; slot < slotsToShow; slot++) {
-        renderSlot(slot);
+      const total = poolElements.length;
+      // Si hay menos del MAX_VISIBLE, mostrar las que haya
+      const visibles = Math.min(MAX_VISIBLE, total);
+
+      // Insertamos visibles (primeros visibles)
+      for (let i = 0; i < visibles; i++) {
+        const el = poolElements[i];
+        el.classList.remove("hidden");
+        noticiasCont.appendChild(el);
+      }
+      // Insertamos el resto pero con clase hidden (para poder activarlas luego)
+      for (let i = visibles; i < total; i++) {
+        const el = poolElements[i];
+        el.classList.add("hidden");
+        // las añadimos al final del contenedor (pero ocultas)
+        noticiasCont.appendChild(el);
       }
     }
 
-    // --- Obtener texto para resumen: description || content || title ---
+    // ====== Obtener texto para resumir ======
     function getTextoParaResumen(art) {
+      if (!art) return "";
       return art.description || art.content || art.title || "";
     }
 
-    // --- Render de una única tarjeta (slot 0..4) ---
-    function renderSlot(slotIndex) {
-      const poolIndex = displaySlots[slotIndex];
-      const art = noticiasPool[poolIndex];
-      const div = document.createElement("div");
-      div.className = "noticia";
-      div.dataset.slot = slotIndex;
-      div.dataset.poolIndex = poolIndex;
+    // ====== Manejar click Regenerar (en una tarjeta visible) ======
+    // La función recibe poolIndex del botón clicado (poolIndex del artículo que actualmente está visible).
+    function handleRegenerarOnVisible(clickedPoolIndex) {
+      if (!esAdmin) { alert("Solo el admin puede regenerar."); return; }
 
-      // badge que indica posición en pool (opcional pero útil)
-      const badge = `<div class="badge">#${poolIndex + 1} / ${noticiasPool.length}</div>`;
-
-      const imgHtml = art.urlToImage ? `<img src="${art.urlToImage}" alt="Imagen">` : "";
-      const descripcionBase = art.description || "Sin descripción disponible.";
-
-      div.innerHTML = `
-        ${badge}
-        ${imgHtml}
-        <div class="titulo">${escapeHtml(art.title || "Sin título")}</div>
-        <div class="descripcion">${escapeHtml(descripcionBase)}</div>
-        <div class="resumen"><em>Generando resumen...</em></div>
-        <a class="enlace" href="${art.url || '#'}" target="_blank">Leer más</a>
-        <button class="regenerar-btn">Regenerar</button>
-      `;
-
-      noticiasCont.appendChild(div);
-
-      // añadir listener para el botón regenerar (no usar onclick inline)
-      const btn = div.querySelector(".regenerar-btn");
-      btn.addEventListener("click", () => reemplazarSlotPorSiguiente(slotIndex));
-
-      // si admin ya activo, mostrar botón
-      if (esAdmin) btn.style.display = "block";
-
-      // pedir resumen
-      const texto = getTextoParaResumen(art);
-      const resumenDiv = div.querySelector(".resumen");
-      generarResumen(texto, resumenDiv);
-    }
-
-    // --- Reemplazar un slot (0..4) por la siguiente noticia disponible en pool (nextPoolIndex) ---
-    function reemplazarSlotPorSiguiente(slotIndex) {
-      if (!esAdmin) { alert("Solo admin puede regenerar."); return; }
-
-      if (nextPoolIndex >= noticiasPool.length) {
-        alert("No hay más noticias disponibles en el pool para reemplazar.");
+      // 1) localizar el elemento DOM actual del poolIndex que está visible
+      const currentEl = poolElements.find(el => Number(el.dataset.poolIndex) === clickedPoolIndex);
+      if (!currentEl) {
+        console.warn("Elemento visible no encontrado para poolIndex", clickedPoolIndex);
         return;
       }
 
-      // actualizar mapping displaySlots
-      displaySlots[slotIndex] = nextPoolIndex;
-      const nuevoPoolIdx = nextPoolIndex;
-      nextPoolIndex++;
+      // 2) marcarlo como eliminado y quitar del DOM
+      currentEl.dataset.removed = "true";
+      currentEl.classList.add("removed");
+      currentEl.remove(); // lo quitamos del DOM (ya no estará disponible para reactivarse)
 
-      // encontrar la tarjeta DOM para ese slot y actualizarla (evitamos re-render completo)
-      const tarjeta = document.querySelector(`.noticia[data-slot="${slotIndex}"]`);
-      if (!tarjeta) {
-        // por seguridad, re-render si falla el selector
-        renderAllSlots();
+      // 3) buscar la primera noticia "desactivada" (hidden) que NO esté marcada como removed
+      const nextHidden = poolElements.find(el => el.dataset.removed === "false" && el.classList.contains("hidden"));
+      if (!nextHidden) {
+        alert("No hay más noticias desactivadas disponibles para activar.");
         return;
       }
 
-      const art = noticiasPool[nuevoPoolIdx];
-      // imagen
-      if (art.urlToImage) {
-        let img = tarjeta.querySelector("img");
-        if (!img) {
-          img = document.createElement("img");
-          const firstChild = tarjeta.firstChild;
-          tarjeta.insertBefore(img, firstChild); // al principio
+      // 4) activar esa noticia: quitar clase hidden y moverla a la posición donde estaba la eliminada
+      nextHidden.classList.remove("hidden");
+      // inserción: queremos que ocupe la posición visual del elemento eliminado.
+      // Calculamos índice de posición en grid igual al índice del elemento eliminado en el contenedor (si fuera posible).
+      // Como hemos eliminado currentEl, tomamos la posición de inserción como el índice del primer elemento posterior.
+      // Para simplificar y garantizar orden, insertamos nextHidden en la misma posición en la que se encontraba currentEl:
+      // buscamos el número de elementos visibles actuales y la posición en el DOM donde debe ir.
+      // Insertarlo en el lugar correcto: vamos a posicionarlo en la primera posición vacante en las visibles.
+      // Implementación práctica: insertar nextHidden en la posición correspondiente al número de hijos del contenedor hasta el lugar del removed.
+      // Para encontrar esa "posición", usaremos la posición del removed en el pool original.
+      const removedPoolIndex = Number(clickedPoolIndex);
+      // calculamos cuántos visibles hay ahora (tras la eliminación)
+      const visiblesAhora = Array.from(noticiasCont.children).filter(ch => !ch.classList.contains("hidden") && ch.dataset && ch.dataset.poolIndex !== undefined).length;
+      // Si hay menos de MAX_VISIBLE visibles, insertamos nextHidden al final de las visibles:
+      // buscar primer hijo que esté oculto o el final
+      // Buscamos el primer hijo que tenga clase hidden: lo reemplazamos por nextHidden. Si no hay, insertamos al final.
+      const hijos = Array.from(noticiasCont.children);
+      let inserted = false;
+      for (let i = 0; i < hijos.length; i++) {
+        if (hijos[i].classList && hijos[i].classList.contains("hidden")) {
+          noticiasCont.insertBefore(nextHidden, hijos[i]);
+          inserted = true;
+          break;
         }
-        img.src = art.urlToImage;
-      } else {
-        const img = tarjeta.querySelector("img");
-        if (img) img.remove();
       }
-      // badge
-      const badge = tarjeta.querySelector(".badge");
-      if (badge) badge.textContent = `#${nuevoPoolIdx + 1} / ${noticiasPool.length}`;
+      if (!inserted) {
+        noticiasCont.appendChild(nextHidden);
+      }
 
-      // título, descripción, enlace
-      tarjeta.querySelector(".titulo").textContent = art.title || "Sin título";
-      tarjeta.querySelector(".descripcion").textContent = art.description || art.content || "Sin descripción disponible.";
-      const enlace = tarjeta.querySelector(".enlace");
-      enlace.href = art.url || "#";
+      // 5) mostrar botón regenerar en el nuevo elemento si admin
+      const btn = nextHidden.querySelector(".regenerar-btn");
+      if (btn) btn.style.display = esAdmin ? "block" : "none";
 
-      // actualizar data attributes
-      tarjeta.dataset.poolIndex = nuevoPoolIdx;
+      // 6) (opcional) actualizar badges para claridad (posición pool)
+      actualizarBadges();
 
-      // generar nuevo resumen
-      const resumenDiv = tarjeta.querySelector(".resumen");
-      resumenDiv.innerHTML = "<em>Generando nuevo resumen...</em>";
-      generarResumen(getTextoParaResumen(art), resumenDiv);
+      // ya está: nextHidden fue activado en lugar del eliminado
     }
 
-    // --- Genera resumen con Gemini (proxy) ---
+    // ====== Actualizar contenido de badges según poolElements orden real ======
+    function actualizarBadges() {
+      poolElements.forEach((el, idx) => {
+        const b = el.querySelector(".badge");
+        if (b) b.textContent = `#${idx + 1} / ${poolElements.length}`;
+      });
+    }
+
+    // ====== Generar resumen usando proxy Gemini ======
     async function generarResumen(textoOriginal, elementoDestino) {
       try {
         if (!textoOriginal || textoOriginal.trim().length === 0) {
           elementoDestino.textContent = "No hay texto para resumir.";
           return;
         }
-
         const prompt = `Resume brevemente el siguiente texto de una noticia tecnológica en español, de forma natural y clara:\n\n${textoOriginal}`;
-
         const body = { contents: [{ parts: [{ text: prompt }] }] };
 
         const resp = await fetch(GEMINI_API_URL, {
@@ -252,7 +272,7 @@
       }
     }
 
-    // --- Util: escapar HTML simple para seguridad al insertar títulos/descr ---
+    // ====== Util: escapar HTML para títulos/descr ======
     function escapeHtml(str) {
       return String(str)
         .replaceAll("&", "&amp;")
@@ -262,7 +282,7 @@
         .replaceAll("'", "&#039;");
     }
 
-    // --- INICIO ---
+    // ====== INICIO ======
     fetchNoticiasPool();
   </script>
 </body>
