@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Noticias Tecnología (10 preparadas, 5 visibles)</title>
+  <title>Noticias Tecnología (10 preparadas, 6 visibles)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     body {
@@ -77,13 +77,13 @@
   </div>
 
   <div id="noticias">
-    <!-- 10 divs idénticos -->
+    <!-- 10 divs idénticos, ahora 6 visibles -->
     <div class="noticia" id="n1"></div>
     <div class="noticia" id="n2"></div>
     <div class="noticia" id="n3"></div>
     <div class="noticia" id="n4"></div>
     <div class="noticia" id="n5"></div>
-    <div class="noticia" id="n6"></div>
+    <div class="noticia" id="n6"></div> <!-- visible -->
     <div class="noticia" id="n7" style="display:none"></div>
     <div class="noticia" id="n8" style="display:none"></div>
     <div class="noticia" id="n9" style="display:none"></div>
@@ -91,7 +91,6 @@
   </div>
 
   <script>
-    // === CONFIG ===
     const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
     const GEMINI_API_URL = "https://gemini.carlosrojasgomariz.workers.dev/";
     const ADMIN_PASSWORD = "durum2025";
@@ -99,7 +98,7 @@
     let noticias = [];
     let esAdmin = false;
     const TOTAL = 10;
-    const VISIBLES = 6;
+    const VISIBLES = 6; // ahora 6 noticias visibles
 
     // === ADMIN PANEL ===
     const adminButton = document.getElementById("adminButton");
@@ -138,17 +137,14 @@
           return;
         }
 
-        // Rellenar los 10 contenedores con sus datos
         for (let i = 0; i < TOTAL; i++) {
           const cont = document.getElementById(`n${i + 1}`);
           const art = noticias[i];
           cont.innerHTML = crearPlantillaNoticia(art, i);
 
-          // Generar resumen
           const resumenDiv = cont.querySelector(".resumen");
           generarResumen(getTexto(art), resumenDiv);
 
-          // Botón regenerar
           const btn = cont.querySelector(".regenerar-btn");
           btn.addEventListener("click", () => regenerarNoticia(i + 1));
         }
@@ -157,7 +153,6 @@
       }
     }
 
-    // === CREAR PLANTILLA DE NOTICIA ===
     function crearPlantillaNoticia(art, index) {
       const img = art.urlToImage ? `<img src="${art.urlToImage}" alt="Imagen">` : "";
       const title = art.title || "Sin título";
@@ -172,12 +167,10 @@
       `;
     }
 
-    // === TEXTO PARA RESUMIR ===
     function getTexto(art) {
       return art.description || art.content || art.title || "";
     }
 
-    // === GENERAR RESUMEN CON GEMINI ===
     async function generarResumen(texto, destino) {
       try {
         if (!texto || texto.trim().length === 0) {
@@ -198,7 +191,6 @@
       }
     }
 
-    // === REGENERAR NOTICIA ===
     function regenerarNoticia(indice) {
       if (!esAdmin) {
         alert("Solo el admin puede regenerar noticias.");
@@ -209,7 +201,6 @@
       if (!actual) return;
       actual.remove();
 
-      // Mostrar la siguiente noticia oculta
       for (let i = VISIBLES + 1; i <= TOTAL; i++) {
         const siguiente = document.getElementById(`n${i}`);
         if (siguiente && siguiente.style.display === "none") {
@@ -221,7 +212,6 @@
       alert("No hay más noticias para mostrar.");
     }
 
-    // === UTILIDAD ===
     function escapeHtml(str) {
       return String(str)
         .replaceAll("&", "&amp;")
