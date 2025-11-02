@@ -1,344 +1,100 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IA Newsroom - Blog de Tecnología</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* CSS para el esqueleto visual */
-        :root {
-            --color-negro: #0b0b10;
-            --color-azul-oscuro: #151459;
-            --color-fondo-texto: #1d2b52;
-            --color-footer: #050505;
-            --color-texto-principal: #ffffff;
-            --font-telegraf: 'Roboto', sans-serif; /* Placeholder para Telegraf */
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: var(--font-telegraf);
-            color: var(--color-texto-principal);
-            background-color: var(--color-negro); /* Fondo inicial si el banner no cubre */
-            scroll-snap-type: y mandatory; /* Habilita el 'scroll-snap' */
-        }
-
-        /* Contenedor principal para cada sección de noticia (vista de pantalla completa al hacer scroll) */
-        .seccion-noticia {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 50px;
-            scroll-snap-align: start; /* El punto de inicio de cada sección se alineará al hacer scroll */
-        }
-
-        /* Banner Inicial */
-        .banner {
-            background-image: url('Fondo_Banner.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            position: relative;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5); /* Oscurece la imagen de fondo para que el texto resalte */
-            z-index: 1;
-        }
-
-        .banner-contenido {
-            position: relative;
-            z-index: 2;
-            padding: 20px;
-        }
-
-        .titulo-principal {
-            font-size: 3em;
-            font-weight: bold;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .subtitulo {
-            font-size: 1.2em;
-            margin-bottom: 30px;
-        }
-        
-        /* Controles y Frase del Día */
-        .banner-header {
-            position: absolute;
-            top: 20px;
-            width: 95%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 3;
-        }
-
-        .banner-header-left span {
-            background-color: var(--color-azul-oscuro);
-            padding: 8px 15px;
-            border-radius: 5px;
-            margin-right: 10px;
-            cursor: pointer;
-            font-size: 0.8em;
-        }
-
-        .banner-header-right div {
-            display: inline-block;
-            width: 25px;
-            height: 25px;
-            background-color: var(--color-azul-oscuro);
-            border-radius: 50%;
-            margin-left: 5px;
-            text-align: center;
-            line-height: 25px;
-            font-size: 0.8em;
-            cursor: pointer;
-        }
-
-        .frase-del-dia {
-            background-color: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            padding: 30px 50px;
-            margin-top: 50px;
-            border-radius: 10px;
-            text-align: center;
-            width: 40%;
-            min-height: 150px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .frase-del-dia p {
-            font-style: italic;
-        }
-
-        /* Estilos de las Noticias */
-        .noticia-1, .noticia-3, .noticia-5 {
-            background: linear-gradient(to bottom, var(--color-negro), var(--color-azul-oscuro));
-        }
-
-        .noticia-2, .noticia-4 {
-            background: linear-gradient(to bottom, var(--color-azul-oscuro), var(--color-negro));
-        }
-
-        .noticia-contenido {
-            width: 80%;
-            max-width: 1200px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-top: 30px;
-        }
-
-        .noticia-titulo {
-            font-size: 2em;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-align: center;
-            width: 100%;
-            grid-column: 1 / -1; /* Ocupa ambas columnas */
-        }
-
-        .caja-noticia {
-            background-color: var(--color-fondo-texto);
-            padding: 20px;
-            border-radius: 10px;
-            min-height: 250px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.1em;
-        }
-
-        .caja-imagen {
-            /* Mantiene el color de fondo para la estructura vacía */
-        }
-        
-        .caja-texto {
-            /* Mantiene el color de fondo para la estructura vacía */
-            text-align: left;
-        }
-
-        /* Icono del 'Link' o 'Anchor' junto al título de la noticia */
-        .noticia-titulo-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            grid-column: 1 / -1;
-            margin-bottom: 20px;
-        }
-        
-        .noticia-titulo-wrapper h2 {
-            margin-right: 15px;
-            font-size: 2em;
-        }
-        
-        .noticia-titulo-wrapper span {
-            /* Placeholder para el icono de Link */
-            font-size: 1.5em;
-            transform: rotate(-45deg);
-        }
-
-        /* Footer */
-        .footer {
-            height: auto; /* Para que se adapte al contenido */
-            width: 100%;
-            background-color: rgba(5, 5, 5, 0.74); /* #050505 con 74% de transparencia */
-            padding: 20px;
-            font-size: 0.8em;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            position: fixed;
-            bottom: 0;
-            z-index: 10;
-        }
-        
-        .footer-left p {
-            margin: 2px 0;
-        }
-        
-        .footer-right {
-            display: flex;
-            align-items: center;
-        }
-        
-        .footer-right span {
-            margin-right: 20px;
-            text-transform: uppercase;
-        }
-        
-        .footer-right div {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            background-color: var(--color-azul-oscuro);
-            border-radius: 50%;
-            margin-left: 5px;
-            text-align: center;
-            line-height: 20px;
-            font-size: 0.7em;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA Newsroom - Blog de Tecnología</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --color-negro:#0b0b10;
+      --color-azul-oscuro:#151459;
+      --color-fondo-texto:#1d2b52;
+      --color-footer:#050505;
+      --color-texto-principal:#ffffff;
+      --font-telegraf:'Roboto',sans-serif;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font-telegraf);color:var(--color-texto-principal);background-color:var(--color-negro);scroll-snap-type:y mandatory;}
+    .seccion-noticia{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px;scroll-snap-align:start;}
+    /* Banner con Fondo Banner.png */
+    .banner{background-image:url('assets/img/Fondo Banner.png');background-size:cover;background-position:center;background-repeat:no-repeat;position:relative;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+    .overlay{position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:1;}
+    .banner-contenido{position:relative;z-index:2;padding:20px;}
+    .titulo-principal{font-size:3em;font-weight:bold;text-transform:uppercase;margin-bottom:5px;}
+    .subtitulo{font-size:1.2em;margin-bottom:30px;}
+    .banner-header{position:absolute;top:20px;width:95%;display:flex;justify-content:space-between;align-items:center;z-index:3;}
+    .banner-header-left span{background-color:var(--color-azul-oscuro);padding:8px 15px;border-radius:5px;margin-right:10px;cursor:pointer;font-size:.8em;}
+    .banner-header-right div{display:inline-block;width:25px;height:25px;background-color:var(--color-azul-oscuro);border-radius:50%;margin-left:5px;text-align:center;line-height:25px;font-size:.8em;cursor:pointer;}
+    .frase-del-dia{background-color:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.5);padding:30px 50px;margin-top:50px;border-radius:10px;text-align:center;width:40%;min-height:150px;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+    .frase-del-dia p{font-style:italic;}
+    .icono-chip{height:22px;width:22px;vertical-align:middle;margin-right:8px;}
+    .icono-noticia{height:22px;width:22px;vertical-align:middle;margin-left:8px;}
+    .noticia-1,.noticia-3,.noticia-5{background:linear-gradient(to bottom,var(--color-negro),var(--color-azul-oscuro));}
+    .noticia-2,.noticia-4{background:linear-gradient(to bottom,var(--color-azul-oscuro),var(--color-negro));}
+    .noticia-contenido{width:80%;max-width:1200px;display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:30px;}
+    .caja-noticia{background-color:var(--color-fondo-texto);padding:20px;border-radius:10px;min-height:250px;display:flex;justify-content:center;align-items:center;font-size:1.1em;}
+    .noticia-titulo-wrapper{display:flex;align-items:center;justify-content:center;grid-column:1 / -1;margin-bottom:20px;}
+    .noticia-titulo-wrapper h2{font-size:2em;display:flex;align-items:center;gap:10px;}
+    .footer{width:100%;background-color:rgba(5,5,5,0.74);padding:20px;font-size:.8em;display:flex;justify-content:space-between;align-items:flex-end;position:fixed;bottom:0;z-index:10;}
+    .footer-right{display:flex;align-items:center;gap:6px;text-transform:uppercase;}
+    .footer-right div{display:inline-block;width:20px;height:20px;background-color:var(--color-azul-oscuro);border-radius:50%;text-align:center;line-height:20px;font-size:.7em;cursor:pointer;}
+  </style>
 </head>
 <body>
-
-    <section class="seccion-noticia banner">
-        <div class="overlay"></div>
-        <div class="banner-header">
-            <div class="banner-header-left">
-                <span>Fecha</span>
-                <span>Admin Login</span>
-            </div>
-            <div class="banner-header-right">
-                <div>1</div>
-                <div>2</div>
-                <div>3</div>
-                <div>4</div>
-                <div>5</div>
-            </div>
-        </div>
-        <div class="banner-contenido">
-            <h1 class="titulo-principal">IA Newsroom</h1>
-            <p class="subtitulo">NOTICIAS DE TECNOLOGÍA</p>
-            <div class="frase-del-dia">
-                <span>&#9733; Frase del Día</span>
-                <p>[Contenido de la Frase del Día]</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="seccion-noticia noticia-1">
-        <div class="noticia-titulo-wrapper">
-            <h2><span class="numero-noticia">①</span> NOTICIA</h2>
-            <span>&#8631;</span> </div>
-        <div class="noticia-contenido">
-            <div class="caja-noticia caja-texto">Texto</div>
-            <div class="caja-noticia caja-imagen">Imagen</div>
-        </div>
-    </section>
-
-    <section class="seccion-noticia noticia-2">
-        <div class="noticia-titulo-wrapper">
-            <h2><span class="numero-noticia">②</span> NOTICIA</h2>
-            <span>&#8631;</span>
-        </div>
-        <div class="noticia-contenido">
-            <div class="caja-noticia caja-imagen">Imagen</div>
-            <div class="caja-noticia caja-texto">Texto</div>
-        </div>
-    </section>
-
-    <section class="seccion-noticia noticia-3">
-        <div class="noticia-titulo-wrapper">
-            <h2><span class="numero-noticia">③</span> NOTICIA</h2>
-            <span>&#8631;</span>
-        </div>
-        <div class="noticia-contenido">
-            <div class="caja-noticia caja-texto">Texto</div>
-            <div class="caja-noticia caja-imagen">Imagen</div>
-        </div>
-    </section>
-
-    <section class="seccion-noticia noticia-4">
-        <div class="noticia-titulo-wrapper">
-            <h2><span class="numero-noticia">④</span> NOTICIA</h2>
-            <span>&#8631;</span>
-        </div>
-        <div class="noticia-contenido">
-            <div class="caja-noticia caja-imagen">Imagen</div>
-            <div class="caja-noticia caja-texto">Texto</div>
-        </div>
-    </section>
-
-    <section class="seccion-noticia noticia-5">
-        <div class="noticia-titulo-wrapper">
-            <h2><span class="numero-noticia">⑤</span> NOTICIA</h2>
-            <span>&#8631;</span>
-        </div>
-        <div class="noticia-contenido">
-            <div class="caja-noticia caja-texto">Texto</div>
-            <div class="caja-noticia caja-imagen">Imagen</div>
-        </div>
-    </section>
-
-    <footer class="footer">
-        <div class="footer-left">
-            <p>Carlos Reyes Gomariz</p>
-            <p>Juan Manuel Peralta Afonso</p>
-        </div>
-        <div class="footer-right">
-            <span>README</span>
-            <div>1</div>
-            <div>2</div>
-            <div>3</div>
-            <div>4</div>
-            <div>5</div>
-        </div>
-    </footer>
-
+  <section class="seccion-noticia banner">
+    <div class="overlay"></div>
+    <div class="banner-header">
+      <div class="banner-header-left">
+        <span>Fecha</span>
+        <span>Admin Login</span>
+      </div>
+      <div class="banner-header-right">
+        <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div>
+      </div>
+    </div>
+    <div class="banner-contenido">
+      <h1 class="titulo-principal">IA Newsroom</h1>
+      <p class="subtitulo">NOTICIAS DE TECNOLOGÍA</p>
+      <div class="frase-del-dia">
+        <div><img src="assets/icons/chip.svg" class="icono-chip" alt="chip icon">Frase del Día</div>
+        <p>[Contenido de la Frase del Día]</p>
+      </div>
+    </div>
+  </section>
+  <section class="seccion-noticia noticia-1">
+    <div class="noticia-titulo-wrapper">
+      <h2><span>①</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="icono ratón"></h2>
+    </div>
+    <div class="noticia-contenido"><div class="caja-noticia">Texto</div><div class="caja-noticia">Imagen</div></div>
+  </section>
+  <section class="seccion-noticia noticia-2">
+    <div class="noticia-titulo-wrapper">
+      <h2><span>②</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="icono ratón"></h2>
+    </div>
+    <div class="noticia-contenido"><div class="caja-noticia">Imagen</div><div class="caja-noticia">Texto</div></div>
+  </section>
+  <section class="seccion-noticia noticia-3">
+    <div class="noticia-titulo-wrapper">
+      <h2><span>③</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="icono ratón"></h2>
+    </div>
+    <div class="noticia-contenido"><div class="caja-noticia">Texto</div><div class="caja-noticia">Imagen</div></div>
+  </section>
+  <section class="seccion-noticia noticia-4">
+    <div class="noticia-titulo-wrapper">
+      <h2><span>④</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="icono ratón"></h2>
+    </div>
+    <div class="noticia-contenido"><div class="caja-noticia">Imagen</div><div class="caja-noticia">Texto</div></div>
+  </section>
+  <section class="seccion-noticia noticia-5">
+    <div class="noticia-titulo-wrapper">
+      <h2><span>⑤</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="icono ratón"></h2>
+    </div>
+    <div class="noticia-contenido"><div class="caja-noticia">Texto</div><div class="caja-noticia">Imagen</div></div>
+  </section>
+  <footer class="footer">
+    <div class="footer-left"><p>Carlos Reyes Gomariz</p><p>Juan Manuel Peralta Afonso</p></div>
+    <div class="footer-right"><span>README</span><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div></div>
+  </footer>
 </body>
 </html>
