@@ -3,405 +3,342 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IA Newsroom</title>
+    <title>IA Newsroom - Blog de Tecnología</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root{
-            /* Paleta solicitada */
-            --bg:#F0F9FF;           /* Fondo Blanco humo */
-            --text:#1F2937;         /* Gris carbón */
-            --head:#000000;         /* Encabezados negro */
-            --accent:#1E3A8A;       /* Azul medianoche */
-            --accent-2:#FACC15;     /* Amarillo dorado */
-            --hover:#2563EB;        /* Azul real (hover enlaces) */
-            --card:#ffffff;
-            --border:#1E3A8A;
-            --muted:#64748b;
-
-            /* Nuevas tokens visuales */
-            --radius:16px;
-            --radius-sm:10px;
-            --shadow-sm: 0 2px 10px rgba(30,58,138,.06);
-            --shadow-md: 0 8px 30px rgba(30,58,138,.10);
-            --shadow-lg: 0 24px 60px rgba(30,58,138,.12);
+        /* CSS para el esqueleto visual */
+        :root {
+            --color-negro: #0b0b10;
+            --color-azul-oscuro: #151459;
+            --color-fondo-texto: #1d2b52;
+            --color-footer: #050505;
+            --color-texto-principal: #ffffff;
+            --font-telegraf: 'Roboto', sans-serif; /* Placeholder para Telegraf */
         }
 
-        *{margin:0;padding:0;box-sizing:border-box}
-        html{scroll-behavior:smooth}
-        body{
-            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-            color: var(--text);
-            line-height: 1.65;
-            min-height:100dvh;
-            position:relative;
-            overflow-x:hidden;
-            /* Fondo base (debajo de la capa animada) */
-            background: radial-gradient(1200px 800px at 10% -10%, #dbeafe 0%, transparent 60%),
-                        radial-gradient(1200px 900px at 110% 110%, #e0e7ff 0%, transparent 60%),
-                        var(--bg);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* ===== Fondo dinámico (CSS puro, accesible y ligero) ===== */
-        body::before{
-            content:"";
-            position:fixed;
-            inset:-20%;
-            z-index:-1;
-            background:
-              radial-gradient(40% 35% at 10% 10%, rgba(30,58,138,.20), transparent 60%),
-              radial-gradient(35% 30% at 90% 20%, rgba(250,204,21,.20), transparent 60%),
-              radial-gradient(30% 35% at 20% 90%, rgba(37,99,235,.18), transparent 60%),
-              conic-gradient(from 0deg at 50% 50%, rgba(30,58,138,.06), rgba(30,58,138,0) 25%, rgba(250,204,21,.06) 50%, rgba(30,58,138,0) 75%, rgba(30,58,138,.06));
-            filter: blur(40px) saturate(1.05);
-            animation: bgMove 28s ease-in-out infinite alternate;
-            pointer-events:none;
-        }
-        @keyframes bgMove{
-            0%   { transform: translate3d(0,0,0) scale(1); }
-            50%  { transform: translate3d(-2%,2%,0) scale(1.05); }
-            100% { transform: translate3d(2%,-2%,0) scale(1.03); }
-        }
-        @media (prefers-reduced-motion: reduce){
-            body::before{ animation:none }
+        body {
+            font-family: var(--font-telegraf);
+            color: var(--color-texto-principal);
+            background-color: var(--color-negro); /* Fondo inicial si el banner no cubre */
+            scroll-snap-type: y mandatory; /* Habilita el 'scroll-snap' */
         }
 
-        a{ color: var(--accent); text-decoration: none; transition: color .2s ease }
-        a:hover{ color: var(--hover); text-decoration: underline }
-
-        /* ===== Header minimal ===== */
-        header{
-            backdrop-filter: blur(6px);
-            background: color-mix(in oklab, var(--card) 78%, transparent);
-            border-bottom: 1px solid color-mix(in oklab, var(--border) 30%, #000 0%);
-            padding: 14px 20px;
-            display:grid;
-            grid-template-columns: 1fr auto 1fr; /* izq | centro | dcha */
-            align-items:center;
-            gap:12px;
-            position:sticky; top:0; z-index:10;
-        }
-        .header-left{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-
-        .fecha{
-            padding:8px 12px;
-            font-weight:700;
-            font-size:14px;
-            color: var(--head);
-            border-radius: 999px;
-            border:1px solid color-mix(in oklab, var(--border) 35%, #000 0%);
-            background: #fff;
-            box-shadow: var(--shadow-sm);
+        /* Contenedor principal para cada sección de noticia (vista de pantalla completa al hacer scroll) */
+        .seccion-noticia {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px;
+            scroll-snap-align: start; /* El punto de inicio de cada sección se alineará al hacer scroll */
         }
 
-        .site-title{
-            justify-self:center;
-            padding:6px 12px;
-            font-weight:900;
-            font-size:18px;
-            color: var(--head);
-            border-radius: 999px;
-            border:1px solid color-mix(in oklab, var(--border) 35%, #000 0%);
-            background:#fff;
-            letter-spacing:.2px;
+        /* Banner Inicial */
+        .banner {
+            background-image: url('Fondo_Banner.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
-        .links-header{
-            justify-self:end;
-            display:flex; gap:8px; align-items:center;
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5); /* Oscurece la imagen de fondo para que el texto resalte */
+            z-index: 1;
         }
-        .link-circle{
-            width:34px; height:34px; border-radius:50%;
-            display:grid; place-items:center;
-            font-weight:700; color:var(--head);
-            border:1px solid color-mix(in oklab, var(--border) 45%, #000 0%);
-            background:#fff;
-            box-shadow: var(--shadow-sm);
-            transition: transform .15s ease, box-shadow .15s ease;
+
+        .banner-contenido {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
         }
-        .link-circle:hover{ transform: translateY(-1px); box-shadow: var(--shadow-md); }
 
-        .btn-admin{
-            border:1px solid color-mix(in oklab, var(--accent) 60%, #000 0%);
-            background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 88%, #fff 12%), var(--accent));
-            color:#fff; padding:8px 12px; border-radius:10px;
-            font-weight:700; cursor:pointer; transition: filter .15s ease, transform .06s ease;
-            box-shadow: 0 6px 14px rgba(30,58,138,.18);
+        .titulo-principal {
+            font-size: 3em;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 5px;
         }
-        .btn-admin:hover{ filter: brightness(1.05) }
-        .btn-admin:active{ transform: translateY(1px) }
 
-        /* ===== Main ===== */
-        main{ max-width: 1080px; margin: 26px auto; padding: 0 16px; }
+        .subtitulo {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        
+        /* Controles y Frase del Día */
+        .banner-header {
+            position: absolute;
+            top: 20px;
+            width: 95%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 3;
+        }
 
-        .noticia{
-            background: color-mix(in oklab, #fff 92%, var(--bg) 8%);
-            border: 1px solid color-mix(in oklab, var(--border) 22%, #000 0%);
+        .banner-header-left span {
+            background-color: var(--color-azul-oscuro);
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin-right: 10px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        .banner-header-right div {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            background-color: var(--color-azul-oscuro);
+            border-radius: 50%;
+            margin-left: 5px;
+            text-align: center;
+            line-height: 25px;
+            font-size: 0.8em;
+            cursor: pointer;
+        }
+
+        .frase-del-dia {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 30px 50px;
+            margin-top: 50px;
+            border-radius: 10px;
+            text-align: center;
+            width: 40%;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .frase-del-dia p {
+            font-style: italic;
+        }
+
+        /* Estilos de las Noticias */
+        .noticia-1, .noticia-3, .noticia-5 {
+            background: linear-gradient(to bottom, var(--color-negro), var(--color-azul-oscuro));
+        }
+
+        .noticia-2, .noticia-4 {
+            background: linear-gradient(to bottom, var(--color-azul-oscuro), var(--color-negro));
+        }
+
+        .noticia-contenido {
+            width: 80%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .noticia-titulo {
+            font-size: 2em;
+            font-weight: bold;
             margin-bottom: 20px;
-            padding: 18px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-md);
-            transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease;
-        }
-        .noticia:hover{
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
-            border-color: color-mix(in oklab, var(--border) 40%, #000 0%);
+            text-align: center;
+            width: 100%;
+            grid-column: 1 / -1; /* Ocupa ambas columnas */
         }
 
-        .noticia-header{
-            display:flex; align-items:center; gap:12px; margin-bottom:14px;
-        }
-        .badge-numero{
-            min-width:40px; height:40px; border-radius:999px;
-            background: var(--accent-2);
-            color: var(--head);
-            font-weight:800; display:grid; place-items:center;
-            border:1px solid color-mix(in oklab, var(--head) 70%, #000 0%);
-            box-shadow: var(--shadow-sm);
-        }
-        .noticia-titulo-wrapper{
-            flex:1 1 auto;
-            padding:10px 12px;
-            border-left:4px solid var(--accent);
-            background: linear-gradient(90deg, rgba(30,58,138,.06), transparent 60%);
-            border-radius: 8px;
-        }
-        .noticia h1{
-            font-size: clamp(18px, 2.2vw, 22px);
-            margin:0; color: var(--head); letter-spacing:.1px;
+        .caja-noticia {
+            background-color: var(--color-fondo-texto);
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1em;
         }
 
-        .noticia-content{
-            display:grid; grid-template-columns: 1fr 1fr; gap:14px;
+        .caja-imagen {
+            /* Mantiene el color de fondo para la estructura vacía */
         }
-        .noticia-texto{
-            background:#fff; border:1px solid color-mix(in oklab, var(--border) 20%, #000 0%);
-            border-radius: var(--radius-sm); padding:14px; box-shadow: var(--shadow-sm);
-        }
-        .noticia p{ font-size: 15.5px; margin:0; color: var(--text); }
-
-        .noticia-imagen{
-            background:
-              linear-gradient(135deg, #EEF2FF 0%, #E5EAF3 100%);
-            border: 1px dashed color-mix(in oklab, var(--border) 35%, #000 0%);
-            min-height: 220px;
-            border-radius: var(--radius-sm);
-            display:grid; place-items:center; position:relative; overflow:hidden;
-            isolation:isolate;
-        }
-        .noticia-imagen::before{
-            /* sutil malla animada para “imagen por llegar” */
-            content:"";
-            position:absolute; inset:-25%;
-            background:
-              radial-gradient(40% 35% at 20% 20%, rgba(30,58,138,.10), transparent 60%),
-              radial-gradient(30% 25% at 80% 30%, rgba(250,204,21,.18), transparent 60%),
-              radial-gradient(25% 30% at 40% 80%, rgba(37,99,235,.12), transparent 60%);
-            filter: blur(24px);
-            animation: mesh 24s ease-in-out infinite alternate;
-            z-index:0;
-        }
-        @keyframes mesh{
-            0%{ transform: translate3d(0,0,0) scale(1); }
-            100%{ transform: translate3d(-3%,2%,0) scale(1.05); }
-        }
-        .noticia-imagen::after{
-            content:"Imagen de la noticia";
-            font-size: 13px; color: var(--muted); z-index:1;
+        
+        .caja-texto {
+            /* Mantiene el color de fondo para la estructura vacía */
+            text-align: left;
         }
 
-        /* ===== Mensaje del día ===== */
-        .mensaje-dia{
-            background: color-mix(in oklab, #fff 92%, var(--bg) 8%);
-            border:1px solid color-mix(in oklab, var(--border) 22%, #000 0%);
-            padding:18px; text-align:center; font-size: clamp(18px, 2.5vw, 22px);
-            font-weight:800; color: var(--head);
-            border-radius: var(--radius); margin: 12px 0 26px;
-            box-shadow: var(--shadow-md);
+        /* Icono del 'Link' o 'Anchor' junto al título de la noticia */
+        .noticia-titulo-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            grid-column: 1 / -1;
+            margin-bottom: 20px;
+        }
+        
+        .noticia-titulo-wrapper h2 {
+            margin-right: 15px;
+            font-size: 2em;
+        }
+        
+        .noticia-titulo-wrapper span {
+            /* Placeholder para el icono de Link */
+            font-size: 1.5em;
+            transform: rotate(-45deg);
         }
 
-        /* ===== Footer ===== */
-        footer{
-            backdrop-filter: blur(6px);
-            background: color-mix(in oklab, var(--card) 78%, transparent);
-            border-top: 1px solid color-mix(in oklab, var(--border) 30%, #000 0%);
-            padding: 18px 20px;
-            display:flex; justify-content:space-between; align-items:flex-start; gap:16px;
+        /* Footer */
+        .footer {
+            height: auto; /* Para que se adapte al contenido */
+            width: 100%;
+            background-color: rgba(5, 5, 5, 0.74); /* #050505 con 74% de transparencia */
+            padding: 20px;
+            font-size: 0.8em;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            position: fixed;
+            bottom: 0;
+            z-index: 10;
         }
-        .footer-section h3{ font-size:14px; margin-bottom:6px; color: var(--head); }
-        .footer-section p, .footer-section li{ font-size:13.5px; color: var(--text); }
-        .footer-section ul{ list-style:none; padding-left:0; }
-        .links-footer{ display:flex; gap:8px; align-items:center; }
-        .links-footer .link-circle{ opacity:.95; }
-
-        /* ===== Responsive ===== */
-        @media (max-width: 900px){
-            .noticia-content{ grid-template-columns:1fr; }
+        
+        .footer-left p {
+            margin: 2px 0;
         }
-        @media (max-width: 768px){
-            header{ grid-template-columns: 1fr; }
-            .site-title{ justify-self:center; }
-            .links-header{ justify-content:center }
-            .fecha{ order:2 }
-            .btn-admin{ order:1 }
+        
+        .footer-right {
+            display: flex;
+            align-items: center;
         }
-
-        /* ===== Accesibilidad ligera ===== */
-        :focus-visible{ outline: 3px solid color-mix(in oklab, var(--accent) 70%, #fff 30%); outline-offset: 2px }
+        
+        .footer-right span {
+            margin-right: 20px;
+            text-transform: uppercase;
+        }
+        
+        .footer-right div {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: var(--color-azul-oscuro);
+            border-radius: 50%;
+            margin-left: 5px;
+            text-align: center;
+            line-height: 20px;
+            font-size: 0.7em;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <div class="header-left">
-            <div class="fecha">Fecha de hoy</div>
-            <!-- Aquí va el botón Admin Login, ocupando el lugar del antiguo título -->
-            <button class="btn-admin" aria-label="Iniciar sesión administrador" onclick="window.location.href='#admin-login'">Admin Login</button>
+
+    <section class="seccion-noticia banner">
+        <div class="overlay"></div>
+        <div class="banner-header">
+            <div class="banner-header-left">
+                <span>Fecha</span>
+                <span>Admin Login</span>
+            </div>
+            <div class="banner-header-right">
+                <div>1</div>
+                <div>2</div>
+                <div>3</div>
+                <div>4</div>
+                <div>5</div>
+            </div>
         </div>
-
-        <!-- Título centrado -->
-        <div class="site-title">IA Newsroom</div>
-
-        <!-- Navegación numérica -->
-        <nav class="links-header" aria-label="Ir a noticias">
-            <div class="link-circle"><a href="#noticia-1">1</a></div>
-            <div class="link-circle"><a href="#noticia-2">2</a></div>
-            <div class="link-circle"><a href="#noticia-3">3</a></div>
-            <div class="link-circle"><a href="#noticia-4">4</a></div>
-            <div class="link-circle"><a href="#noticia-5">5</a></div>
-        </nav>
-    </header>
-
-    <!-- Main Content -->
-    <main>
-        <!-- Noticia 1 -->
-        <article class="noticia" id="noticia-1">
-            <div class="noticia-header">
-                <div class="badge-numero">1</div>
-                <div class="noticia-titulo-wrapper">
-                    <h1 id="news-1-title">Título de la noticia aquí</h1>
-                </div>
+        <div class="banner-contenido">
+            <h1 class="titulo-principal">IA Newsroom</h1>
+            <p class="subtitulo">NOTICIAS DE TECNOLOGÍA</p>
+            <div class="frase-del-dia">
+                <span>&#9733; Frase del Día</span>
+                <p>[Contenido de la Frase del Día]</p>
             </div>
-            <div class="noticia-content">
-                <div class="noticia-texto" id="news-1-text">
-                    <p>Texto de la noticia. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                </div>
-                <div class="noticia-imagen" id="news-1-image">
-                    <!-- <img src="url-imagen" alt="Imagen noticia"> -->
-                </div>
-            </div>
-        </article>
-
-        <!-- Noticia 2 -->
-        <article class="noticia" id="noticia-2">
-            <div class="noticia-header">
-                <div class="badge-numero">2</div>
-                <div class="noticia-titulo-wrapper">
-                    <h1 id="news-2-title">Título de la noticia aquí</h1>
-                </div>
-            </div>
-            <div class="noticia-content">
-                <div class="noticia-texto" id="news-2-text">
-                    <p>Texto de la noticia. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                </div>
-                <div class="noticia-imagen" id="news-2-image">
-                    <!-- <img src="url-imagen" alt="Imagen noticia"> -->
-                </div>
-            </div>
-        </article>
-
-        <!-- Noticia 3 -->
-        <article class="noticia" id="noticia-3">
-            <div class="noticia-header">
-                <div class="badge-numero">3</div>
-                <div class="noticia-titulo-wrapper">
-                    <h1 id="news-3-title">Título de la noticia aquí</h1>
-                </div>
-            </div>
-            <div class="noticia-content">
-                <div class="noticia-texto" id="news-3-text">
-                    <p>Texto de la noticia. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                </div>
-                <div class="noticia-imagen" id="news-3-image">
-                    <!-- <img src="url-imagen" alt="Imagen noticia"> -->
-                </div>
-            </div>
-        </article>
-
-        <!-- Noticia 4 -->
-        <article class="noticia" id="noticia-4">
-            <div class="noticia-header">
-                <div class="badge-numero">4</div>
-                <div class="noticia-titulo-wrapper">
-                    <h1 id="news-4-title">Título de la noticia aquí</h1>
-                </div>
-            </div>
-            <div class="noticia-content">
-                <div class="noticia-texto" id="news-4-text">
-                    <p>Texto de la noticia. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                </div>
-                <div class="noticia-imagen" id="news-4-image">
-                    <!-- <img src="url-imagen" alt="Imagen noticia"> -->
-                </div>
-            </div>
-        </article>
-
-        <!-- Noticia 5 -->
-        <article class="noticia" id="noticia-5">
-            <div class="noticia-header">
-                <div class="badge-numero">5</div>
-                <div class="noticia-titulo-wrapper">
-                    <h1 id="news-5-title">Título de la noticia aquí</h1>
-                </div>
-            </div>
-            <div class="noticia-content">
-                <div class="noticia-texto" id="news-5-text">
-                    <p>Texto de la noticia. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                </div>
-                <div class="noticia-imagen" id="news-5-image">
-                    <!-- <img src="url-imagen" alt="Imagen noticia"> -->
-                </div>
-            </div>
-        </article>
-
-        <!-- Mensaje del día -->
-        <div class="mensaje-dia" id="mensaje-dia">
-            Mensaje del día
         </div>
-    </main>
+    </section>
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-section" style="min-width:260px;">
-            <h3>Autores</h3>
-            <ul>
-                <li><a href="https://github.com/CrojasGit/" target="_blank" rel="noopener">Carlos Rojas Gomariz</a></li>
-                <li><a href="https://github.com/marianaangarita" target="_blank" rel="noopener">Mariana Elvira Angarita Afonso</a></li>
-            </ul>
+    <section class="seccion-noticia noticia-1">
+        <div class="noticia-titulo-wrapper">
+            <h2><span class="numero-noticia">①</span> NOTICIA</h2>
+            <span>&#8631;</span> </div>
+        <div class="noticia-contenido">
+            <div class="caja-noticia caja-texto">Texto</div>
+            <div class="caja-noticia caja-imagen">Imagen</div>
         </div>
-        <div class="footer-section">
-            <h3>Info (readme)</h3>
-            <p><a href="#">(enlace al README)</a></p>
+    </section>
+
+    <section class="seccion-noticia noticia-2">
+        <div class="noticia-titulo-wrapper">
+            <h2><span class="numero-noticia">②</span> NOTICIA</h2>
+            <span>&#8631;</span>
         </div>
-        <nav class="links-footer" aria-label="Ir a noticias (footer)">
-            <div class="link-circle"><a href="#noticia-1">1</a></div>
-            <div class="link-circle"><a href="#noticia-2">2</a></div>
-            <div class="link-circle"><a href="#noticia-3">3</a></div>
-            <div class="link-circle"><a href="#noticia-4">4</a></div>
-            <div class="link-circle"><a href="#noticia-5">5</a></div>
-        </nav>
+        <div class="noticia-contenido">
+            <div class="caja-noticia caja-imagen">Imagen</div>
+            <div class="caja-noticia caja-texto">Texto</div>
+        </div>
+    </section>
+
+    <section class="seccion-noticia noticia-3">
+        <div class="noticia-titulo-wrapper">
+            <h2><span class="numero-noticia">③</span> NOTICIA</h2>
+            <span>&#8631;</span>
+        </div>
+        <div class="noticia-contenido">
+            <div class="caja-noticia caja-texto">Texto</div>
+            <div class="caja-noticia caja-imagen">Imagen</div>
+        </div>
+    </section>
+
+    <section class="seccion-noticia noticia-4">
+        <div class="noticia-titulo-wrapper">
+            <h2><span class="numero-noticia">④</span> NOTICIA</h2>
+            <span>&#8631;</span>
+        </div>
+        <div class="noticia-contenido">
+            <div class="caja-noticia caja-imagen">Imagen</div>
+            <div class="caja-noticia caja-texto">Texto</div>
+        </div>
+    </section>
+
+    <section class="seccion-noticia noticia-5">
+        <div class="noticia-titulo-wrapper">
+            <h2><span class="numero-noticia">⑤</span> NOTICIA</h2>
+            <span>&#8631;</span>
+        </div>
+        <div class="noticia-contenido">
+            <div class="caja-noticia caja-texto">Texto</div>
+            <div class="caja-noticia caja-imagen">Imagen</div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-left">
+            <p>Carlos Reyes Gomariz</p>
+            <p>Juan Manuel Peralta Afonso</p>
+        </div>
+        <div class="footer-right">
+            <span>README</span>
+            <div>1</div>
+            <div>2</div>
+            <div>3</div>
+            <div>4</div>
+            <div>5</div>
+        </div>
     </footer>
 
-    <!-- Sección ficticia de login para demostrar la navegación del botón -->
-    <div id="admin-login" style="position:fixed;bottom:20px;right:20px;background:#fff;border:2px solid var(--border);padding:10px 12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.1);display:none;">
-        <strong>Login Admin</strong>
-        <p>(Conecte aquí su formulario real cuando esté listo).</p>
-    </div>
-    <script>
-      // (opcional) Mostrar un mock de login sin salir de la página
-      // document.querySelector('.btn-admin').addEventListener('click', () => {
-      //   const panel = document.getElementById('admin-login');
-      //   panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-      // });
-    </script>
 </body>
 </html>
