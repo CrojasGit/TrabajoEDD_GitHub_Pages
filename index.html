@@ -1,127 +1,50 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Noticias Tecnología (10 preparadas, 6 visibles) + Frase del Día</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 30px;
-      background:#f4f4f9;
-      color:#333;
-    }
-    h1 { text-align:center; }
-
-    /* === FRASE DEL DÍA === */
-    #fraseDia {
-      text-align:center;
-      background:#fff;
-      border-radius:12px;
-      padding:15px;
-      margin:20px auto;
-      max-width:800px;
-      box-shadow:0 0 6px rgba(0,0,0,0.1);
-      font-style:italic;
-      line-height:1.4;
-    }
-    #autorFrase {
-      display:block;
-      margin-top:8px;
-      font-weight:600;
-      color:#555;
-    }
-
-    #adminPanel { text-align:center; margin-bottom:20px; }
-    #adminButton {
-      background:#333; color:#fff; border:none;
-      padding:10px 15px; border-radius:8px; cursor:pointer;
-    }
-    #adminButton:hover { background:#555; }
-    #passwordInput { display:none; margin-top:10px; }
-    #noticias {
-      display:grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap:20px;
-      margin-top:30px;
-    }
-    .noticia {
-      background:#fff;
-      padding:15px;
-      border-radius:12px;
-      box-shadow:0 0 8px rgba(0,0,0,0.1);
-      position:relative;
-      min-height:180px;
-      transition:all 0.3s ease;
-    }
-    .noticia img {
-      max-width:100%;
-      border-radius:10px;
-      display:block;
-      margin-bottom:8px;
-    }
-    .titulo { font-weight:700; font-size:18px; margin:8px 0; }
-    .descripcion { color:#555; }
-    .resumen { margin-top:10px; font-style:italic; color:#444; }
-    .enlace {
-      display:inline-block;
-      margin-top:10px;
-      color:#0077cc;
-      text-decoration:none;
-    }
-    .enlace:hover { text-decoration:underline; }
-    .regenerar-btn {
-      display:none;
-      position:absolute;
-      top:10px;
-      right:10px;
-      background:orange;
-      color:#fff;
-      border:none;
-      padding:6px 10px;
-      border-radius:6px;
-      cursor:pointer;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Noticias Tecnología</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-  <h1>Noticias de Tecnología (con resúmenes IA)</h1>
-  <span id="fecha">Fecha</span>
+  <h1>Noticias de Tecnología</h1>
+  <span id="fecha"></span>
 
-  <!-- === FRASE DEL DÍA === -->
-  <div id="fraseDia" aria-live="polite">
+  <!-- Frase del día -->
+  <div id="fraseDia">
     <span id="textoFrase">Cargando frase del día...</span>
     <span id="autorFrase"></span>
   </div>
 
+  <!-- Panel administrador -->
   <div id="adminPanel">
     <button id="adminButton">Modo Admin</button>
-    <div id="passwordInput">
-      <input type="password" id="adminPass" placeholder="Introduce contraseña" />
+    <div id="passwordInput" style="display:none;">
+      <input type="password" id="adminPass" placeholder="Contraseña">
       <button id="loginButton">Entrar</button>
     </div>
     <div id="adminStatus"></div>
   </div>
 
+  <!-- Contenedor de noticias -->
   <div id="noticias">
-    <div class="noticia" id="n1"></div>
-    <div class="noticia" id="n2"></div>
-    <div class="noticia" id="n3"></div>
-    <div class="noticia" id="n4"></div>
-    <div class="noticia" id="n5"></div>
-    <div class="noticia" id="n6" style="display:none"></div>
-    <div class="noticia" id="n7" style="display:none"></div>
-    <div class="noticia" id="n8" style="display:none"></div>
-    <div class="noticia" id="n9" style="display:none"></div>
-    <div class="noticia" id="n10" style="display:none"></div>
-    <div class="noticia" id="n11" style="display:none"></div>
-    <div class="noticia" id="n12" style="display:none"></div>
-    <div class="noticia" id="n13" style="display:none"></div>
-    <div class="noticia" id="n14" style="display:none"></div>
-    <div class="noticia" id="n15" style="display:none"></div>
-    <div class="noticia" id="n16" style="display:none"></div>
-    <div class="noticia" id="n17" style="display:none"></div>
-    <div class="noticia" id="n18" style="display:none"></div>
+    <div id="n1" class="noticia"></div>
+    <div id="n2" class="noticia"></div>
+    <div id="n3" class="noticia"></div>
+    <div id="n4" class="noticia"></div>
+    <div id="n5" class="noticia"></div>
+    <div id="n6" class="noticia" style="display:none;"></div>
+    <div id="n7" class="noticia" style="display:none;"></div>
+    <div id="n8" class="noticia" style="display:none;"></div>
+    <div id="n9" class="noticia" style="display:none;"></div>
+    <div id="n10" class="noticia" style="display:none;"></div>
+    <div id="n11" class="noticia" style="display:none;"></div>
+    <div id="n12" class="noticia" style="display:none;"></div>
+    <div id="n13" class="noticia" style="display:none;"></div>
+    <div id="n14" class="noticia" style="display:none;"></div>
+    <div id="n15" class="noticia" style="display:none;"></div>
+    <div id="n16" class="noticia" style="display:none;"></div>
+    <div id="n17" class="noticia" style="display:none;"></div>
+    <div id="n18" class="noticia" style="display:none;"></div>
   </div>
 
   <script src="noticiasIA.js"></script>
