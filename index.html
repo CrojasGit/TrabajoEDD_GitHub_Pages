@@ -46,7 +46,7 @@
     .banner-header{
       position:absolute; top:18px; left:0; right:0;             /* ocupa todo el ancho */
       width:100%; padding:0 16px;                                /* empuja a los extremos */
-      display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:18px;
+      display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:18px; /* CENTRA el título entre izq/der */
       z-index:3;
     }
     /* Fecha + Admin (totalmente a la izquierda) */
@@ -134,7 +134,7 @@
     .noticia-titulo-wrapper{
       display:flex; align-items:center; justify-content:center; gap:12px;
       grid-column:1 / -1; margin-bottom:10px;
-      margin-top:-24px;                            /* DESPLAZADO HACIA ARRIBA */
+      margin-top:-40px;                            /* MÁS ARRIBA */
     }
     .noticia-titulo-wrapper h2{ font-size:36px; display:flex; align-items:center; gap:12px; } /* MÁS GRANDE */
     .icono-noticia{ width:36px; height:36px; } /* ratón más grande */
