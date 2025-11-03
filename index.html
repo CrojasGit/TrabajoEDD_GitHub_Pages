@@ -9,6 +9,87 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
+    /* ==== OVERRIDES: texto SIEMPRE izquierda con un ÚNICO fondo gris;
+   imagen SIEMPRE derecha con marco negro; título arriba como en index.html ==== */
+
+/* 2 columnas fijo (texto izq + imagen der) */
+.noticia-contenido{
+  width:min(1200px,88vw);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns: 1.1fr 0.9fr; /* texto un poco más ancho */
+  gap:32px;
+  align-items:stretch;
+  position:relative; /* para el pseudo-fondo del panel */
+}
+
+/* Fondo único gris bajo la columna de texto (izquierda) */
+.noticia-contenido::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  right:calc(50% - 16px);        /* cubre aprox. la 1ª columna */
+  background:#1f2937;            /* gris carbón del mock */
+  border-radius:14px;
+  border:1.5px solid rgba(0,0,0,.45);
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+  z-index:0;                     /* debajo del contenido */
+}
+
+/* Forzar SIEMPRE el texto a la columna izquierda, sin fondos parciales */
+.noticia :is(.titulo,.descripcion,.resumen,.enlace){
+  grid-column:1;
+  position:relative; z-index:1;  /* sobre el panel gris */
+  background:transparent;        /* quitamos fondos de piezas */
+  border:none; box-shadow:none; margin:0; padding:0;
+}
+
+/* Espaciado/tipografía coherente en el bloque de texto */
+.noticia .titulo{
+  font-weight:900; font-size:22px; line-height:1.2; margin-bottom:10px;
+}
+.noticia .descripcion{ margin-bottom:10px; opacity:.95; }
+.noticia .resumen{ font-style:italic; margin-bottom:16px; opacity:.95; }
+.noticia .enlace{
+  display:inline-block; text-decoration:none; color:#fff; font-weight:800;
+  text-transform:uppercase; padding:10px 14px; border:2px solid #fff; border-radius:10px;
+}
+
+/* Imagen SIEMPRE derecha con línea negra y cover */
+.noticia img{
+  grid-column:2;
+  width:100%; height:100%;
+  object-fit:cover;
+  border:2px solid #000;         /* marco negro */
+  border-radius:14px;
+  background:transparent; box-shadow:none;
+  min-height:260px;
+}
+
+/* Si no hay imagen, el panel gris ocupa todo el ancho y queda 1 columna */
+.noticia:not(:has(img)) .noticia-contenido{
+  grid-template-columns:1fr;
+}
+.noticia:not(:has(img)) .noticia-contenido::before{
+  right:0;
+}
+
+/* Refuerzo visual del título (nº + icono) */
+.noticia-titulo{
+  display:flex; align-items:center; justify-content:center; gap:12px;
+  margin-top:10px; font-size:32px; font-weight:900; text-transform:uppercase; letter-spacing:.5px;
+}
+.icono-noticia{ width:32px; height:32px; }
+
+/* Responsive */
+@media (max-width:900px){
+  .noticia-contenido{ grid-template-columns:1fr; gap:18px; }
+  .noticia-contenido::before{ right:0; }     /* el panel gris ocupa todo en móvil */
+  .noticia img{ grid-column:1; height:42vh; }/* la imagen se apila, mantiene marco */
+  .noticia-titulo{ font-size:26px; }
+  .icono-noticia{ width:26px; height:26px; }
+}
+
     :root{
       --color-negro:#0b0b10;
       --color-azul-oscuro:#151459;
