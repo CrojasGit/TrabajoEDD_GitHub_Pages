@@ -4,7 +4,7 @@ const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
 
     let noticias = [];
     let esAdmin = false;
-    const TOTAL = 18;
+    const TOTAL = 10;
     const VISIBLES = 5; // ahora 6 noticias visibles
     // Fecha automática
     document.getElementById('fecha').textContent = new Date().toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
@@ -436,4 +436,5 @@ const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
     // Inicia carga de noticias (asíncrona)
 
     cargarNoticias();
+
 
