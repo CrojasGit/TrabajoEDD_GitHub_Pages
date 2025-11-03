@@ -1,5 +1,5 @@
 const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
-const GEMINI_API_URL = "https://gemini.carlosrojasgomariz.workers.dev/";
+const GEMINI_API_URL = "https://cold-shark-87.crojasgit.deno.net/";
 const ADMIN_PASSWORD = "12345";
 
 let noticias = [];
@@ -467,6 +467,7 @@ function escapeHtml(str) {
 
 // === Inicio ===
 cargarNoticias();
+
 
 
 
