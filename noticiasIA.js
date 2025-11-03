@@ -371,19 +371,30 @@ async function cargarNoticias() {
 }
 
 function crearPlantillaNoticia(art, index) {
-      const img = art && art.urlToImage ? `<img src="${art.urlToImage}" alt="Imagen">` : "";
-      const title = art && art.title ? art.title : "Sin título";
-      const desc = art && (art.description || art.content) ? (art.description || art.content) : "Sin descripción disponible.";
-      const url = art && art.url ? art.url : "#";
-      return `
-        ${img}
+  const img = art && art.urlToImage
+    ? `<img class="noticia-img" src="${art.urlToImage}" alt="Imagen">`
+    : "";
+  const title = art && art.title ? art.title : "Sin título";
+  const desc =
+    art && (art.description || art.content)
+      ? art.description || art.content
+      : "Sin descripción disponible.";
+  const url = art && art.url ? art.url : "#";
+
+  return `
+    <div class="noticia" style="display: flex; align-items: flex-start; gap: 15px;">
+      <div class="texto" style="flex: 1;">
         <div class="titulo">${escapeHtml(title)}</div>
         <div class="descripcion">${escapeHtml(desc)}</div>
         <div class="resumen"><em>Generando resumen...</em></div>
         <a class="enlace" href="${url}" target="_blank" rel="noopener">Leer más</a>
         <button class="regenerar-btn" style="display:none;">Regenerar</button>
-      `;
-    }
+      </div>
+      ${img}
+    </div>
+  `;
+}
+
 
 function getTexto(art) {
   return art && (art.description || art.content || art.title) ? (art.description || art.content || art.title) : "";
@@ -467,6 +478,7 @@ function escapeHtml(str) {
 
 // === Inicio ===
 cargarNoticias();
+
 
 
 
