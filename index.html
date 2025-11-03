@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -43,12 +44,12 @@
 
     /* ======= HEADER SUPERIOR ======= */
     .banner-header{
-      position:absolute; top:18px; left:50%; transform:translateX(-50%);
-      width:min(1200px,94vw);
+      position:absolute; top:18px; left:0; right:0;             /* ocupa todo el ancho */
+      width:100%; padding:0 16px;                                /* empuja a los extremos */
       display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:18px;
       z-index:3;
     }
-    /* Fecha + Admin */
+    /* Fecha + Admin (totalmente a la izquierda) */
     .badge{ 
       background:var(--accent-admin);
       color:#fff; font-weight:800; letter-spacing:.5px;
@@ -64,17 +65,17 @@
       padding:12px 18px; border-radius:14px; border:2px solid rgba(255,255,255,.35);
       box-shadow:0 6px 18px rgba(0,0,0,.25); font-size:14px;
     }
-    .left-cluster{display:flex; gap:12px; align-items:center;}
+    .left-cluster{display:flex; gap:12px; align-items:center; justify-self:start;}
 
-    /* Título centrado entre izquierda y botones */
+    /* Título centrado */
     .brand{
-      text-align:center; line-height:1.05;
+      text-align:center; line-height:1.05; justify-self:center;
     }
-    .brand h1{ font-size:28px; letter-spacing:2px; font-weight:900; }
-    .brand p{ font-size:14px; opacity:.9; font-weight:700; margin-top:2px; }
+    .brand h1{ font-size:40px; letter-spacing:2px; font-weight:900; }        /* MÁS GRANDE */
+    .brand p{ font-size:18px; opacity:.9; font-weight:700; margin-top:2px; }  /* MÁS GRANDE */
 
-    /* Botones 1..5 más grandes */
-    .navnums{display:flex; gap:10px;}
+    /* Botones 1..5 totalmente a la derecha */
+    .navnums{display:flex; gap:10px; justify-self:end;}
     .navbtn{
       width:46px; height:46px; border-radius:999px;
       display:grid; place-items:center;
@@ -102,8 +103,9 @@
     }
     .frase-header{
       display:flex; align-items:center; gap:14px; font-weight:900; letter-spacing:1px;
-      font-size:24px;                        /* Título más grande */
+      font-size:24px;                        /* Título igual de grande */
       text-transform:uppercase;
+      margin-top:-8px;                       /* DESPLAZADA UN POCO HACIA ARRIBA */
     }
     .icono-chip{ width:32px; height:32px; }  /* icono más grande */
     .frase-del-dia p{ font-style:italic; font-size:18px; text-align:center; opacity:.95; }
@@ -121,12 +123,21 @@
       display:flex; justify-content:center; align-items:center; font-size:1.1em;
       border:1.5px solid rgba(0,0,0,.45); box-shadow:0 10px 30px rgba(0,0,0,.35);
     }
+    /* Imagen SIN color, solo borde negro */
+    .caja-imagen{
+      background:transparent !important;
+      border:2px solid #000 !important;
+      box-shadow:none !important;
+      color:#fff;
+    }
+
     .noticia-titulo-wrapper{
       display:flex; align-items:center; justify-content:center; gap:12px;
       grid-column:1 / -1; margin-bottom:10px;
+      margin-top:-24px;                            /* DESPLAZADO HACIA ARRIBA */
     }
-    .noticia-titulo-wrapper h2{ font-size:28px; display:flex; align-items:center; gap:12px; }
-    .icono-noticia{ width:28px; height:28px; } /* ratón más grande */
+    .noticia-titulo-wrapper h2{ font-size:36px; display:flex; align-items:center; gap:12px; } /* MÁS GRANDE */
+    .icono-noticia{ width:36px; height:36px; } /* ratón más grande */
 
     /* Footer */
     .footer{
@@ -136,7 +147,7 @@
     }
     .footer-left{ justify-self:start; display:flex; flex-direction:column; gap:2px; }
     .footer-left a{ color:#fff; text-decoration:none; font-weight:700; }
-    .footer-center a{ color:#fff; text-decoration:none; font-weight:900; text-transform:uppercase; }
+    .footer-center a{ color:#fff; text-decoration:none; font-weight:900; text-transform:uppercase; font-size:22px; } /* README MÁS GRANDE */
     .footer-right{ justify-self:end; display:flex; align-items:center; gap:10px; }
     .footbtn{
       width:42px; height:42px; border-radius:999px;
@@ -147,9 +158,11 @@
 
     @media (max-width:900px){
       .noticia-contenido{ grid-template-columns:1fr; }
-      .brand h1{ font-size:22px; }
-      .brand p{ font-size:12px; }
+      .brand h1{ font-size:30px; }
+      .brand p{ font-size:14px; }
       .navbtn{ width:42px; height:42px; font-size:16px; }
+      .noticia-titulo-wrapper h2{ font-size:30px; }
+      .icono-noticia{ width:28px; height:28px; }
     }
   </style>
 </head>
@@ -171,7 +184,7 @@
         <p>NOTICIAS DE TECNOLOGÍA</p>
       </div>
 
-      <!-- Botones 1..5 (anclan al TÍTULO de cada noticia) -->
+      <!-- Botones 1..5 (pegados a la derecha) -->
       <nav class="navnums" aria-label="Navegación por noticias">
         <a class="navbtn" href="#t1">1</a>
         <a class="navbtn" href="#t2">2</a>
@@ -200,7 +213,7 @@
     </div>
     <div class="noticia-contenido">
       <div class="caja-noticia">Texto</div>
-      <div class="caja-noticia">Imagen</div>
+      <div class="caja-noticia caja-imagen">Imagen</div>
     </div>
   </section>
 
@@ -209,7 +222,7 @@
       <h2><span>②</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="Icono ratón"></h2>
     </div>
     <div class="noticia-contenido">
-      <div class="caja-noticia">Imagen</div>
+      <div class="caja-noticia caja-imagen">Imagen</div>
       <div class="caja-noticia">Texto</div>
     </div>
   </section>
@@ -220,7 +233,7 @@
     </div>
     <div class="noticia-contenido">
       <div class="caja-noticia">Texto</div>
-      <div class="caja-noticia">Imagen</div>
+      <div class="caja-noticia caja-imagen">Imagen</div>
     </div>
   </section>
 
@@ -229,7 +242,7 @@
       <h2><span>④</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="Icono ratón"></h2>
     </div>
     <div class="noticia-contenido">
-      <div class="caja-noticia">Imagen</div>
+      <div class="caja-noticia caja-imagen">Imagen</div>
       <div class="caja-noticia">Texto</div>
     </div>
   </section>
@@ -240,7 +253,7 @@
     </div>
     <div class="noticia-contenido">
       <div class="caja-noticia">Texto</div>
-      <div class="caja-noticia">Imagen</div>
+      <div class="caja-noticia caja-imagen">Imagen</div>
     </div>
   </section>
 
@@ -271,3 +284,4 @@
   </script>
 </body>
 </html>
+```
