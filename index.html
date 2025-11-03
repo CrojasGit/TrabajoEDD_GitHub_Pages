@@ -9,87 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
-    /* ==== OVERRIDES: texto SIEMPRE izquierda con un ÚNICO fondo gris;
-   imagen SIEMPRE derecha con marco negro; título arriba como en index.html ==== */
-
-/* 2 columnas fijo (texto izq + imagen der) */
-.noticia-contenido{
-  width:min(1200px,88vw);
-  margin:0 auto;
-  display:grid;
-  grid-template-columns: 1.1fr 0.9fr; /* texto un poco más ancho */
-  gap:32px;
-  align-items:stretch;
-  position:relative; /* para el pseudo-fondo del panel */
-}
-
-/* Fondo único gris bajo la columna de texto (izquierda) */
-.noticia-contenido::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  right:calc(50% - 16px);        /* cubre aprox. la 1ª columna */
-  background:#1f2937;            /* gris carbón del mock */
-  border-radius:14px;
-  border:1.5px solid rgba(0,0,0,.45);
-  box-shadow:0 10px 30px rgba(0,0,0,.35);
-  z-index:0;                     /* debajo del contenido */
-}
-
-/* Forzar SIEMPRE el texto a la columna izquierda, sin fondos parciales */
-.noticia :is(.titulo,.descripcion,.resumen,.enlace){
-  grid-column:1;
-  position:relative; z-index:1;  /* sobre el panel gris */
-  background:transparent;        /* quitamos fondos de piezas */
-  border:none; box-shadow:none; margin:0; padding:0;
-}
-
-/* Espaciado/tipografía coherente en el bloque de texto */
-.noticia .titulo{
-  font-weight:900; font-size:22px; line-height:1.2; margin-bottom:10px;
-}
-.noticia .descripcion{ margin-bottom:10px; opacity:.95; }
-.noticia .resumen{ font-style:italic; margin-bottom:16px; opacity:.95; }
-.noticia .enlace{
-  display:inline-block; text-decoration:none; color:#fff; font-weight:800;
-  text-transform:uppercase; padding:10px 14px; border:2px solid #fff; border-radius:10px;
-}
-
-/* Imagen SIEMPRE derecha con línea negra y cover */
-.noticia img{
-  grid-column:2;
-  width:100%; height:100%;
-  object-fit:cover;
-  border:2px solid #000;         /* marco negro */
-  border-radius:14px;
-  background:transparent; box-shadow:none;
-  min-height:260px;
-}
-
-/* Si no hay imagen, el panel gris ocupa todo el ancho y queda 1 columna */
-.noticia:not(:has(img)) .noticia-contenido{
-  grid-template-columns:1fr;
-}
-.noticia:not(:has(img)) .noticia-contenido::before{
-  right:0;
-}
-
-/* Refuerzo visual del título (nº + icono) */
-.noticia-titulo{
-  display:flex; align-items:center; justify-content:center; gap:12px;
-  margin-top:10px; font-size:32px; font-weight:900; text-transform:uppercase; letter-spacing:.5px;
-}
-.icono-noticia{ width:32px; height:32px; }
-
-/* Responsive */
-@media (max-width:900px){
-  .noticia-contenido{ grid-template-columns:1fr; gap:18px; }
-  .noticia-contenido::before{ right:0; }     /* el panel gris ocupa todo en móvil */
-  .noticia img{ grid-column:1; height:42vh; }/* la imagen se apila, mantiene marco */
-  .noticia-titulo{ font-size:26px; }
-  .icono-noticia{ width:26px; height:26px; }
-}
-
     :root{
       --color-negro:#0b0b10;
       --color-azul-oscuro:#151459;
@@ -276,10 +195,73 @@
       .noticia-titulo{ font-size:26px; }
       .icono-noticia{ width:26px; height:26px; }
     }
+
+    /* ==== NUEVO CSS añadido ==== */
+    .noticia-contenido{
+      width:min(1200px,88vw);
+      margin:0 auto;
+      display:grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap:32px;
+      align-items:stretch;
+      position:relative;
+    }
+    .noticia-contenido::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      right:calc(50% - 16px);
+      background:#1f2937;
+      border-radius:14px;
+      border:1.5px solid rgba(0,0,0,.45);
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+      z-index:0;
+    }
+    .noticia :is(.titulo,.descripcion,.resumen,.enlace){
+      grid-column:1;
+      position:relative; z-index:1;
+      background:transparent;
+      border:none; box-shadow:none; margin:0; padding:0;
+    }
+    .noticia .titulo{
+      font-weight:900; font-size:22px; line-height:1.2; margin-bottom:10px;
+    }
+    .noticia .descripcion{ margin-bottom:10px; opacity:.95; }
+    .noticia .resumen{ font-style:italic; margin-bottom:16px; opacity:.95; }
+    .noticia .enlace{
+      display:inline-block; text-decoration:none; color:#fff; font-weight:800;
+      text-transform:uppercase; padding:10px 14px; border:2px solid #fff; border-radius:10px;
+    }
+    .noticia img{
+      grid-column:2;
+      width:100%; height:100%;
+      object-fit:cover;
+      border:2px solid #000;
+      border-radius:14px;
+      background:transparent; box-shadow:none;
+      min-height:260px;
+    }
+    .noticia:not(:has(img)) .noticia-contenido{
+      grid-template-columns:1fr;
+    }
+    .noticia:not(:has(img)) .noticia-contenido::before{
+      right:0;
+    }
+    .noticia-titulo{
+      display:flex; align-items:center; justify-content:center; gap:12px;
+      margin-top:10px; font-size:32px; font-weight:900; text-transform:uppercase; letter-spacing:.5px;
+    }
+    .icono-noticia{ width:32px; height:32px; }
+    @media (max-width:900px){
+      .noticia-contenido{ grid-template-columns:1fr; gap:18px; }
+      .noticia-contenido::before{ right:0; }
+      .noticia img{ grid-column:1; height:42vh; }
+      .noticia-titulo{ font-size:26px; }
+      .icono-noticia{ width:26px; height:26px; }
+    }
   </style>
 </head>
 <body>
-
   <!-- ====== BANNER / HERO ====== -->
   <section class="seccion banner" id="top">
     <div class="overlay"></div>
@@ -305,7 +287,7 @@
       </nav>
     </div>
 
-    <!-- Login admin (toggleado por el botón) -->
+    <!-- Login admin -->
     <div id="passwordInput">
       <input type="password" id="adminPass" placeholder="Contraseña admin" />
       <button id="loginButton">Entrar</button>
@@ -325,15 +307,11 @@
     </div>
   </section>
 
-  <!-- ====== NOTICIAS (cada div = 1 noticia; el JS inyecta contenido) ====== -->
+  <!-- ====== NOTICIAS ====== -->
   <main id="noticias" aria-live="polite">
-    <!-- Cabecera de cada noticia (estática) -->
     <section class="noticia" id="n1">
       <div class="noticia-titulo"><span>①</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="Icono ratón"></div>
-      <div class="noticia-contenido">
-        <!-- El JS insertará <img> y los bloques de texto aquí -->
-        <div class="texto-col"><!-- la columna de texto se forma cuando el JS inyecta .titulo, .descripcion, .resumen, .enlace --></div>
-      </div>
+      <div class="noticia-contenido"><div class="texto-col"></div></div>
       <button class="regenerar-btn">Regenerar</button>
     </section>
 
@@ -357,47 +335,4 @@
 
     <section class="noticia" id="n5">
       <div class="noticia-titulo"><span>⑤</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="Icono ratón"></div>
-      <div class="noticia-contenido"><div class="texto-col"></div></div>
-      <button class="regenerar-btn">Regenerar</button>
-    </section>
-
-    <!-- Noticias extra (ocultas inicialmente por JS cuando toque mostrarlas) -->
-    <section class="noticia" id="n6" style="display:none"><div class="noticia-titulo">NOTICIA</div><div class="noticia-contenido"><div class="texto-col"></div></div><button class="regenerar-btn">Regenerar</button></section>
-    <section class="noticia" id="n7" style="display:none"><div class="noticia-titulo">NOTICIA</div><div class="noticia-contenido"><div class="texto-col"></div></div><button class="regenerar-btn">Regenerar</button></section>
-    <section class="noticia" id="n8" style="display:none"><div class="noticia-titulo">NOTICIA</div><div class="noticia-contenido"><div class="texto-col"></div></div><button class="regenerar-btn">Regenerar</button></section>
-    <section class="noticia" id="n9" style="display:none"><div class="noticia-titulo">NOTICIA</div><div class="noticia-contenido"><div class="texto-col"></div></div><button class="regenerar-btn">Regenerar</button></section>
-    <section class="noticia" id="n10" style="display:none"><div class="noticia-titulo">NOTICIA</div><div class="noticia-contenido"><div class="texto-col"></div></div><button class="regenerar-btn">Regenerar</button></section>
-    <section class="noticia" id="n11" style="display:none"><div class="noticia-titulo">NOTICIA</div><div class="noticia-contenido"><div class="texto-col"></div></div><button class="regenerar-btn">Regenerar</button></section>
-    <section class="noticia" id="n12" style="display:none"><div class="noticia-titulo">NOTICIA</div><div class="noticia-contenido"><div class="texto-col"></div></div><button class="regenerar-btn">Regenerar</button></section>
-    <section class="noticia" id="n13" style="display:none"><div class="noticia-titulo">NOTICIA</div><div class="noticia-contenido"><div class="texto-col"></div></div><button class="regenerar-btn">Regenerar</button></section>
-    <section class="noticia" id="n14" style="display:none"><div class="noticia-titulo">NOTICIA</div><div class="noticia-contenido"><div class="texto-col"></div></div><button class="regenerar-btn">Regenerar</button></section>
-    <section class="noticia" id="n15" style="display:none"><div class="noticia-titulo">NOTICIA</div><div class="noticia-contenido"><div class="texto-col"></div></div><button class="regenerar-btn">Regenerar</button></section>
-    <section class="noticia" id="n16" style="display:none"><div class="noticia-titulo">NOTICIA</div><div class="noticia-contenido"><div class="texto-col"></div></div><button class="regenerar-btn">Regenerar</button></section>
-    <section class="noticia" id="n17" style="display:none"><div class="noticia-titulo">NOTICIA</div><div class="noticia-contenido"><div class="texto-col"></div></div><button class="regenerar-btn">Regenerar</button></section>
-    <section class="noticia" id="n18" style="display:none"><div class="noticia-titulo">NOTICIA</div><div class="noticia-contenido"><div class="texto-col"></div></div><button class="regenerar-btn">Regenerar</button></section>
-  </main>
-
-  <!-- ====== FOOTER ====== -->
-  <footer class="footer">
-    <div class="footer-left">
-      <a href="http://github.com/CrojasGit" target="_blank" rel="noopener noreferrer">CARLOS ROJAS GOMÁRIZ</a>
-      <a href="https://github.com/marianaangarita" target="_blank" rel="noopener noreferrer">MARIANA ELVIRA ANGARITA AFONSO</a>
-    </div>
-
-    <div class="footer-center">
-      <a href="https://github.com/CrojasGit/TrabajoEDD_GitHub_Pages/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a>
-    </div>
-
-    <div class="footer-right" aria-label="Navegación inferior">
-      <a class="footbtn" href="#n1">1</a>
-      <a class="footbtn" href="#n2">2</a>
-      <a class="footbtn" href="#n3">3</a>
-      <a class="footbtn" href="#n4">4</a>
-      <a class="footbtn" href="#n5">5</a>
-    </div>
-  </footer>
-
-  <!-- Tu JS intacto -->
-  <script src="noticiasIA.js"></script>
-</body>
-</html>
+      <div class="noticia-contenido"><div class="texto-col
