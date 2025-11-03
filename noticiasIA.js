@@ -7,8 +7,7 @@ const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
     const TOTAL = 18;
     const VISIBLES = 5; // ahora 6 noticias visibles
     // Fecha automática
-    document.getElementById('fecha').textContent =
-      new Date().toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    document.getElementById('fecha').textContent = new Date().toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
 
     // === FRases del año (365) ===
     // Array de 365 frases únicas en español (una para cada día del año).
@@ -437,3 +436,4 @@ const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
     // Inicia carga de noticias (asíncrona)
 
     cargarNoticias();
+
