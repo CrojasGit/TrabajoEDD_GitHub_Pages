@@ -1,5 +1,5 @@
 const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
-    const GEMINI_API_URL = "https://gemini.carlosrojasgomariz.workers.dev/";
+    const GEMINI_API_URL = "https://gemini2.carlosrojasgomariz.workers.dev//";
     const ADMIN_PASSWORD = "12345";
 
     let noticias = [];
@@ -436,5 +436,6 @@ const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
     // Inicia carga de noticias (asíncrona)
 
     cargarNoticias();
+
 
 
