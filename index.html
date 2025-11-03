@@ -189,9 +189,11 @@ body{
 	padding:50px;
 	position:relative;
 	overflow:hidden;
-	display:grid;
-	grid-template-rows:auto 1fr;
-	gap:24px;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	justify-content:center;
+	gap:20px;
 	scroll-snap-align:start;
 }
 /* Alternar fondos tipo index.html */
@@ -203,86 +205,63 @@ body{
 	align-items:center;
 	justify-content:center;
 	gap:12px;
-	margin-top:10px;
 	font-size:32px;
 	font-weight:900;
 	text-transform:uppercase;
+	width:100%;
 }
 .icono-noticia{ width:32px; height:32px; }
 
-/* Cuerpo de cada noticia en dos columnas (imagen / texto) - REGLAS ANTIGUAS COMENTADAS/REEMPLAZADAS */
-/*
-.noticia-contenido{
-	width:min(1200px,88vw);
-	margin:0 auto;
-	display:grid;
-	grid-template-columns:1fr 1fr;
-	gap:32px;
-	align-items:stretch;
-}
-.noticia img{ ... }
-.texto-col{ ... }
-.titulo, .descripcion, .resumen, .enlace{ ... }
-.titulo{ ... }
-.descripcion{ ... }
-.resumen{ ... }
-.enlace{ ... }
-.noticia:not(:has(img)) .noticia-contenido{ grid-template-columns:1fr; }
-*/
-
-/* --- IMPLEMENTACIÓN DE OVERRIDES SOLICITADOS --- */
-
-/* 2 columnas fijo (texto izq + imagen der) */
+/* NUEVO LAYOUT: Imagen izquierda delimitada + Texto derecha con fondo */
 .noticia-contenido{
 	width: min(1200px, 88vw);
-	margin: 0 auto;
 	display: grid;
-	grid-template-columns: 1.1fr 0.9fr; /* texto un poco más ancho */
+	grid-template-columns: 0.9fr 1.1fr;
 	gap: 32px;
-	align-items: stretch;
-	position: relative; /* para el pseudo-fondo del panel */
+	align-items:stretch;
 }
 
-/* Fondo único gris bajo la columna de texto (izquierda) */
-.noticia-contenido::before{
-	content: "";
-	position: absolute;
-	inset: 0;
-	right: calc(50% - 16px); /* cubre aprox. la 1ª columna */
-	background: #1f2937; /* gris carbón del mock */
-	border-radius: 14px;
-	border: 1.5px solid rgba(0,0,0,.45);
-	box-shadow: 0 10px 30px rgba(0,0,0,.35);
-	z-index: 0; /* debajo del contenido */
-}
-
-/* Forzar SIEMPRE el texto a la columna izquierda, sin fondos parciales */
-.noticia :is(.titulo, .descripcion, .resumen, .enlace){
+/* Imagen izquierda con borde negro */
+.noticia img{
 	grid-column: 1;
-	position: relative;
-	z-index: 1; /* sobre el panel gris */
-	background: transparent; /* quitamos fondos de piezas */
-	border: none;
-	box-shadow: none;
-	margin: 0;
-	padding: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border: 2px solid #000;
+	border-radius: 14px;
+	min-height: 400px;
+	max-height: 600px;
 }
 
-/* Espaciado/tipografía coherente en el bloque de texto */
+/* Contenedor de texto derecha con fondo #1d2b52 */
+.texto-col{
+	grid-column: 2;
+	background: #1d2b52;
+	border-radius: 14px;
+	padding: 30px;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	box-shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+/* Elementos dentro del texto */
 .noticia .titulo{
 	font-weight: 900;
 	font-size: 22px;
 	line-height: 1.2;
-	margin-bottom: 10px;
+	color: #fff;
 }
 .noticia .descripcion{
-	margin-bottom: 10px;
 	opacity: .95;
+	color: #fff;
+	line-height: 1.5;
 }
 .noticia .resumen{
 	font-style: italic;
-	margin-bottom: 16px;
 	opacity: .95;
+	color: #fff;
+	line-height: 1.5;
 }
 .noticia .enlace{
 	display: inline-block;
@@ -290,74 +269,26 @@ body{
 	color: #fff;
 	font-weight: 800;
 	text-transform: uppercase;
-	padding: 10px 14px;
+	padding: 12px 20px;
 	border: 2px solid #fff;
 	border-radius: 10px;
+	align-self: flex-start;
+	margin-top: 8px;
+	transition: background 0.3s ease;
+}
+.noticia .enlace:hover{
+	background: rgba(255,255,255,.1);
 }
 
-/* Imagen SIEMPRE derecha con línea negra y cover */
-.noticia img{
-	grid-column: 2;
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	border: 2px solid #000; /* marco negro */
-	border-radius: 14px;
-	background: transparent;
-	box-shadow: none;
-	min-height: 260px;
-}
-
-/* Si no hay imagen, el panel gris ocupa todo el ancho y queda 1 columna */
+/* Si no hay imagen, el texto ocupa todo el ancho */
 .noticia:not(:has(img)) .noticia-contenido{
 	grid-template-columns: 1fr;
 }
-.noticia:not(:has(img)) .noticia-contenido::before{
-	right: 0;
+.noticia:not(:has(img)) .texto-col{
+	grid-column: 1;
 }
 
-/* Refuerzo visual del título (nº + icono) */
-.noticia-titulo{
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 12px;
-	margin-top: 10px;
-	font-size: 32px;
-	font-weight: 900;
-	text-transform: uppercase;
-	letter-spacing: .5px;
-}
-.icono-noticia{
-	width: 32px;
-	height: 32px;
-}
-
-/* Responsive */
-@media (max-width:900px){
-	.noticia-contenido{
-		grid-template-columns: 1fr;
-		gap: 18px;
-	}
-	.noticia-contenido::before{
-		right: 0; /* el panel gris ocupa todo en móvil */
-	}
-	.noticia img{
-		grid-column: 1;
-		height: 42vh; /* la imagen se apila, mantiene marco */
-	}
-	.noticia-titulo{
-		font-size: 26px;
-	}
-	.icono-noticia{
-		width: 26px;
-		height: 26px;
-	}
-}
-/* --- FIN DEL CSS AÑADIDO / OVERRIDES --- */
-
-
-/* Botón admin de regenerar (lo muestra el JS en modo admin) */
+/* Botón admin de regenerar */
 .regenerar-btn{
 	display:none;
 	position:absolute;
@@ -417,7 +348,26 @@ body{
 	.brand h1{ font-size:30px; }
 	.brand p{ font-size:14px; }
 	.navbtn{ width:42px; height:42px; font-size:16px; }
-	/* Las reglas de media query para .noticia-contenido están ahora definidas al final del bloque de noticias */
+	.noticia-contenido{
+		grid-template-columns: 1fr;
+		gap: 20px;
+	}
+	.noticia img{
+		grid-column: 1;
+		height: 300px;
+		min-height: 250px;
+		max-height: 400px;
+	}
+	.texto-col{
+		grid-column: 1;
+	}
+	.noticia-titulo{
+		font-size: 26px;
+	}
+	.icono-noticia{
+		width: 26px;
+		height: 26px;
+	}
 }
 </style>
 </head>
