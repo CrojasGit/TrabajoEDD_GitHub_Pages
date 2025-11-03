@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,7 +12,7 @@
       --color-fondo-texto:#1d2b52;
       --color-footer:#050505;
       --color-texto-principal:#ffffff;
-      --accent-admin:#410074;               /* NUEVO: color admin/fecha */
+      --accent-admin:#410074;
       --font-telegraf:'Roboto',sans-serif;
     }
     *{margin:0;padding:0;box-sizing:border-box;}
@@ -25,7 +24,6 @@
       scroll-snap-type:y mandatory;
     }
 
-    /* Secciones pantalla completa */
     .seccion-noticia{
       height:100vh;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -34,7 +32,6 @@
       position:relative; overflow:hidden;
     }
 
-    /* Banner con imagen */
     .banner{
       background-image:url('assets/img/Fondo Banner.png');
       background-size:cover; background-position:center; background-repeat:no-repeat;
@@ -42,14 +39,12 @@
     }
     .overlay{position:absolute; inset:0; background:rgba(0,0,0,.45); z-index:1;}
 
-    /* ======= HEADER SUPERIOR ======= */
     .banner-header{
-      position:absolute; top:18px; left:0; right:0;             /* ocupa todo el ancho */
-      width:100%; padding:0 16px;                                /* empuja a los extremos */
-      display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:18px; /* CENTRA el título entre izq/der */
+      position:absolute; top:18px; left:0; right:0;
+      width:100%; padding:0 16px;
+      display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:18px;
       z-index:3;
     }
-    /* Fecha + Admin (totalmente a la izquierda) */
     .badge{ 
       background:var(--accent-admin);
       color:#fff; font-weight:800; letter-spacing:.5px;
@@ -59,22 +54,19 @@
       font-size:14px; box-shadow:0 6px 18px rgba(0,0,0,.25);
     }
     .badge--ghost{ background:var(--accent-admin); }
-    .admin-btn{
+    .admin-btn,#adminButton{
       background:var(--accent-admin);
       color:#fff; font-weight:900; text-transform:uppercase;
       padding:12px 18px; border-radius:14px; border:2px solid rgba(255,255,255,.35);
       box-shadow:0 6px 18px rgba(0,0,0,.25); font-size:14px;
+      cursor:pointer;
     }
     .left-cluster{display:flex; gap:12px; align-items:center; justify-self:start;}
 
-    /* Título centrado */
-    .brand{
-      text-align:center; line-height:1.05; justify-self:center;
-    }
-    .brand h1{ font-size:40px; letter-spacing:2px; font-weight:900; }        /* MÁS GRANDE */
-    .brand p{ font-size:18px; opacity:.9; font-weight:700; margin-top:2px; }  /* MÁS GRANDE */
+    .brand{text-align:center; line-height:1.05; justify-self:center;}
+    .brand h1{ font-size:40px; letter-spacing:2px; font-weight:900; }
+    .brand p{ font-size:18px; opacity:.9; font-weight:700; margin-top:2px; }
 
-    /* Botones 1..5 totalmente a la derecha */
     .navnums{display:flex; gap:10px; justify-self:end;}
     .navbtn{
       width:46px; height:46px; border-radius:999px;
@@ -84,18 +76,16 @@
       box-shadow:0 6px 18px rgba(0,0,0,.25);
     }
 
-    /* Contenedor del banner (cuerpo) */
-    .banner-contenido{ position:relative; z-index:2; padding-top:110px; } /* deja hueco al header fijo */
+    .banner-contenido{ position:relative; z-index:2; padding-top:110px; }
 
-    /* Frase del día – más grande + blur del fondo */
     .frase-del-dia{
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       background-color:rgba(0,0,0,.35);
       border:2px solid rgba(255,255,255,.45);
       border-radius:16px;
-      width:min(900px,92vw);                 /* MÁS GRANDE */
-      min-height:260px;                      /* MÁS ALTO */
+      width:min(900px,92vw);
+      min-height:260px;
       padding:34px 42px;
       margin:26px auto 0;
       display:flex; flex-direction:column; gap:16px; justify-content:center; align-items:center;
@@ -103,14 +93,14 @@
     }
     .frase-header{
       display:flex; align-items:center; gap:14px; font-weight:900; letter-spacing:1px;
-      font-size:24px;                        /* Título igual de grande */
+      font-size:24px;
       text-transform:uppercase;
-      margin-top:-8px;                       /* DESPLAZADA UN POCO HACIA ARRIBA */
+      margin-top:-8px;
     }
-    .icono-chip{ width:32px; height:32px; }  /* icono más grande */
-    .frase-del-dia p{ font-style:italic; font-size:18px; text-align:center; opacity:.95; }
+    .icono-chip{ width:32px; height:32px; }
+    #textoFrase{ font-style:italic; font-size:18px; text-align:center; opacity:.95; }
+    #autorFrase{ margin-top:8px; opacity:.8; }
 
-    /* Noticias */
     .noticia-1,.noticia-3,.noticia-5{background:linear-gradient(to bottom,var(--color-negro),var(--color-azul-oscuro));}
     .noticia-2,.noticia-4{background:linear-gradient(to bottom,var(--color-azul-oscuro),var(--color-negro));}
 
@@ -122,8 +112,8 @@
       padding:22px; border-radius:14px; min-height:280px;
       display:flex; justify-content:center; align-items:center; font-size:1.1em;
       border:1.5px solid rgba(0,0,0,.45); box-shadow:0 10px 30px rgba(0,0,0,.35);
+      text-align:center;
     }
-    /* Imagen SIN color, solo borde negro */
     .caja-imagen{
       background:transparent !important;
       border:2px solid #000 !important;
@@ -134,12 +124,11 @@
     .noticia-titulo-wrapper{
       display:flex; align-items:center; justify-content:center; gap:12px;
       grid-column:1 / -1; margin-bottom:10px;
-      margin-top:-40px;                            /* MÁS ARRIBA */
+      margin-top:-40px;
     }
-    .noticia-titulo-wrapper h2{ font-size:36px; display:flex; align-items:center; gap:12px; } /* MÁS GRANDE */
-    .icono-noticia{ width:36px; height:36px; } /* ratón más grande */
+    .noticia-titulo-wrapper h2{ font-size:36px; display:flex; align-items:center; gap:12px; }
+    .icono-noticia{ width:36px; height:36px; }
 
-    /* Footer */
     .footer{
       width:100%; background-color:rgba(5,5,5,.74); padding:18px 16px; font-size:.9em;
       display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
@@ -147,7 +136,7 @@
     }
     .footer-left{ justify-self:start; display:flex; flex-direction:column; gap:2px; }
     .footer-left a{ color:#fff; text-decoration:none; font-weight:700; }
-    .footer-center a{ color:#fff; text-decoration:none; font-weight:900; text-transform:uppercase; font-size:22px; } /* README MÁS GRANDE */
+    .footer-center a{ color:#fff; text-decoration:none; font-weight:900; text-transform:uppercase; font-size:22px; }
     .footer-right{ justify-self:end; display:flex; align-items:center; gap:10px; }
     .footbtn{
       width:42px; height:42px; border-radius:999px;
@@ -167,24 +156,19 @@
   </style>
 </head>
 <body>
+
   <!-- ========= BANNER ========= -->
   <section class="seccion-noticia banner">
     <div class="overlay"></div>
-
-    <!-- Header superior -->
     <div class="banner-header">
       <div class="left-cluster">
         <span class="badge badge--ghost" id="fecha">Fecha</span>
-        <a class="admin-btn" href="#" aria-label="Login administrador">Admin</a>
+        <button id="adminButton" class="admin-btn">Admin</button>
       </div>
-
-      <!-- TÍTULO CENTRADO ENTRE IZQ Y BOTONES -->
       <div class="brand">
         <h1>IA NEWSROOM</h1>
         <p>NOTICIAS DE TECNOLOGÍA</p>
       </div>
-
-      <!-- Botones 1..5 (pegados a la derecha) -->
       <nav class="navnums" aria-label="Navegación por noticias">
         <a class="navbtn" href="#t1">1</a>
         <a class="navbtn" href="#t2">2</a>
@@ -194,68 +178,46 @@
       </nav>
     </div>
 
-    <!-- Contenido central del banner -->
     <div class="banner-contenido">
-      <div class="frase-del-dia">
+      <div class="frase-del-dia" id="fraseDia">
         <div class="frase-header">
           <img src="assets/icons/chip.svg" class="icono-chip" alt="Icono chip">
           <span>Frase del Día</span>
         </div>
-        <p id="frase">[Contenido de la Frase del Día]</p>
+        <p id="textoFrase">Cargando frase del día...</p>
+        <span id="autorFrase"></span>
       </div>
     </div>
   </section>
 
-  <!-- ========= NOTICIAS ========= -->
-  <section class="seccion-noticia noticia-1" id="n1">
-    <div class="noticia-titulo-wrapper" id="t1">
-      <h2><span>①</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="Icono ratón"></h2>
-    </div>
-    <div class="noticia-contenido">
-      <div class="caja-noticia">Texto</div>
-      <div class="caja-noticia caja-imagen">Imagen</div>
-    </div>
-  </section>
+  <!-- ========= CONTENEDOR DE NOTICIAS DINÁMICAS ========= -->
+  <div id="noticias">
+    <section class="seccion-noticia noticia-1" id="n1"></section>
+    <section class="seccion-noticia noticia-2" id="n2"></section>
+    <section class="seccion-noticia noticia-3" id="n3"></section>
+    <section class="seccion-noticia noticia-4" id="n4"></section>
+    <section class="seccion-noticia noticia-5" id="n5"></section>
+    <section class="seccion-noticia noticia-6" id="n6" style="display:none"></section>
+    <section class="seccion-noticia noticia-7" id="n7" style="display:none"></section>
+    <section class="seccion-noticia noticia-8" id="n8" style="display:none"></section>
+    <section class="seccion-noticia noticia-9" id="n9" style="display:none"></section>
+    <section class="seccion-noticia noticia-10" id="n10" style="display:none"></section>
+    <section class="seccion-noticia noticia-11" id="n11" style="display:none"></section>
+    <section class="seccion-noticia noticia-12" id="n12" style="display:none"></section>
+    <section class="seccion-noticia noticia-13" id="n13" style="display:none"></section>
+    <section class="seccion-noticia noticia-14" id="n14" style="display:none"></section>
+    <section class="seccion-noticia noticia-15" id="n15" style="display:none"></section>
+    <section class="seccion-noticia noticia-16" id="n16" style="display:none"></section>
+    <section class="seccion-noticia noticia-17" id="n17" style="display:none"></section>
+    <section class="seccion-noticia noticia-18" id="n18" style="display:none"></section>
+  </div>
 
-  <section class="seccion-noticia noticia-2" id="n2">
-    <div class="noticia-titulo-wrapper" id="t2">
-      <h2><span>②</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="Icono ratón"></h2>
-    </div>
-    <div class="noticia-contenido">
-      <div class="caja-noticia caja-imagen">Imagen</div>
-      <div class="caja-noticia">Texto</div>
-    </div>
-  </section>
-
-  <section class="seccion-noticia noticia-3" id="n3">
-    <div class="noticia-titulo-wrapper" id="t3">
-      <h2><span>③</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="Icono ratón"></h2>
-    </div>
-    <div class="noticia-contenido">
-      <div class="caja-noticia">Texto</div>
-      <div class="caja-noticia caja-imagen">Imagen</div>
-    </div>
-  </section>
-
-  <section class="seccion-noticia noticia-4" id="n4">
-    <div class="noticia-titulo-wrapper" id="t4">
-      <h2><span>④</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="Icono ratón"></h2>
-    </div>
-    <div class="noticia-contenido">
-      <div class="caja-noticia caja-imagen">Imagen</div>
-      <div class="caja-noticia">Texto</div>
-    </div>
-  </section>
-
-  <section class="seccion-noticia noticia-5" id="n5">
-    <div class="noticia-titulo-wrapper" id="t5">
-      <h2><span>⑤</span> NOTICIA <img src="assets/icons/raton.svg" class="icono-noticia" alt="Icono ratón"></h2>
-    </div>
-    <div class="noticia-contenido">
-      <div class="caja-noticia">Texto</div>
-      <div class="caja-noticia caja-imagen">Imagen</div>
-    </div>
-  </section>
+  <!-- ========= PANEL ADMIN (oculto) ========= -->
+  <div id="passwordInput" style="display:none; text-align:center; margin:20px;">
+    <input type="password" id="adminPass" placeholder="Introduce contraseña" />
+    <button id="loginButton">Entrar</button>
+    <div id="adminStatus"></div>
+  </div>
 
   <!-- ========= FOOTER ========= -->
   <footer class="footer">
@@ -263,11 +225,9 @@
       <a href="http://github.com/CrojasGit" target="_blank" rel="noopener noreferrer">CARLOS ROJAS GOMÁRIZ</a>
       <a href="https://github.com/marianaangarita" target="_blank" rel="noopener noreferrer">MARIANA ELVIRA ANGARITA AFONSO</a>
     </div>
-
     <div class="footer-center">
       <a href="https://github.com/CrojasGit/TrabajoEDD_GitHub_Pages/blob/main/README.md" target="_blank" rel="noopener noreferrer">README</a>
     </div>
-
     <div class="footer-right" aria-label="Navegación inferior">
       <a class="footbtn" href="#t1">1</a>
       <a class="footbtn" href="#t2">2</a>
@@ -277,7 +237,6 @@
     </div>
   </footer>
 
-  
+  <script src="noticiasIA.js"></script>
 </body>
 </html>
-
