@@ -1,5 +1,5 @@
 const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
-const GEMINI_API_URL = "https://clear-ferret-47.crojasgit.deno.net";
+const GEMINI_API_URL = "https://geminideno--main.crojasgit.deno.net/";
 const ADMIN_PASSWORD = "12345";
 
 let noticias = [];
@@ -467,4 +467,5 @@ function escapeHtml(str) {
 
 // === Inicio ===
 cargarNoticias();
+
 
