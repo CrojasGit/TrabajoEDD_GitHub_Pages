@@ -1,17 +1,27 @@
 const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
-    const GEMINI_API_URL = "https://gemini.carlosrojasgomariz.workers.dev/";
-    const ADMIN_PASSWORD = "12345";
+const GEMINI_API_URL = "https://gemini.carlosrojasgomariz.workers.dev/";
+const ADMIN_PASSWORD = "12345";
 
-    let noticias = [];
-    let esAdmin = false;
-    const TOTAL = 18;
-    const VISIBLES = 5; // ahora 6 noticias visibles
-    // Fecha automática
-    document.getElementById('fecha').textContent = new Date().toLocaleDateString('es-ES',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+let noticias = [];
+let esAdmin = false;
+const TOTAL = 18;
+const VISIBLES = 5;
 
-    // === FRases del año (365) ===
-    // Array de 365 frases únicas en español (una para cada día del año).
-    const frasesDelAno = [
+// Cooldown entre peticiones (en milisegundos)
+const COOLDOWN_MS = 2000;
+let ultimaPeticion = 0;
+
+// Cola para las peticiones de resumen
+const colaResumenes = [];
+let procesandoCola = false;
+
+// Fecha automática
+document.getElementById('fecha').textContent = new Date().toLocaleDateString('es-ES',{
+  weekday:'long',day:'2-digit',month:'long',year:'numeric'
+});
+
+// === Frases del año ===
+const frasesDelAno = [
       { texto: `Comienza cada día con la intención de avanzar un paso, por pequeño que sea.`, autor: 'Anónimo' },
       { texto: `La curiosidad es la chispa que enciende cualquier descubrimiento.`, autor: 'Anónimo' },
       { texto: `No confundas el movimiento con el progreso; actúa con propósito.`, autor: 'Anónimo' },
@@ -289,151 +299,171 @@ const NEWS_API_URL = "https://newsapiproxy.carlosrojasgomariz.workers.dev/";
       { texto: `Cuida tus palabras; definen tus acuerdos y tus relaciones.`, autor: 'Anónimo' },
       { texto: `El aprendizaje más valioso es el que cambia tu comportamiento.`, autor: 'Anónimo' }
     ];
-    // (fin del array de 365 frases)
 
-    function cargarFraseDelDia() {
-      const hoy = new Date();
-      // Obtener día del año (1..366)
-      const inicio = new Date(hoy.getFullYear(), 0, 0);
-      const diff = hoy - inicio;
-      const unDia = 1000 * 60 * 60 * 24;
-      let diaDelAno = Math.floor(diff / unDia); // 1..365(366)
-      if (diaDelAno < 1) diaDelAno = 1;
+function cargarFraseDelDia() {
+  const hoy = new Date();
+  const inicio = new Date(hoy.getFullYear(), 0, 0);
+  const diff = hoy - inicio;
+  const unDia = 1000 * 60 * 60 * 24;
+  let diaDelAno = Math.floor(diff / unDia);
+  if (diaDelAno < 1) diaDelAno = 1;
 
-      // Mapear a índice 0..364
-      const index = (diaDelAno - 1) % frasesDelAno.length;
-      const frase = frasesDelAno[index] || { texto: 'Frase no disponible.', autor: 'Anónimo' };
+  const index = (diaDelAno - 1) % frasesDelAno.length;
+  const frase = frasesDelAno[index] || { texto: 'Frase no disponible.', autor: 'Anónimo' };
 
-      document.getElementById("textoFrase").textContent = frase.texto;
-      document.getElementById("autorFrase").textContent = frase.autor ? `— ${frase.autor}` : '';
-    }
+  document.getElementById("textoFrase").textContent = frase.texto;
+  document.getElementById("autorFrase").textContent = frase.autor ? `— ${frase.autor}` : '';
+}
 
-    cargarFraseDelDia();
+cargarFraseDelDia();
 
-    // === ADMIN PANEL ===
-    const adminButton = document.getElementById("adminButton");
-    const passwordDiv = document.getElementById("passwordInput");
-    const loginButton = document.getElementById("loginButton");
-    const adminStatus = document.getElementById("adminStatus");
+// === ADMIN PANEL ===
+const adminButton = document.getElementById("adminButton");
+const passwordDiv = document.getElementById("passwordInput");
+const loginButton = document.getElementById("loginButton");
+const adminStatus = document.getElementById("adminStatus");
 
-    adminButton.addEventListener("click", () => {
-      passwordDiv.style.display = passwordDiv.style.display === "none" ? "block" : "none";
+adminButton.addEventListener("click", () => {
+  passwordDiv.style.display = passwordDiv.style.display === "none" ? "block" : "none";
+});
+
+loginButton.addEventListener("click", () => {
+  const val = document.getElementById("adminPass").value;
+  if (val === ADMIN_PASSWORD) {
+    esAdmin = true;
+    adminStatus.innerHTML = "<span style='color:green'>Modo admin activado ✅</span>";
+    document.querySelectorAll(".regenerar-btn").forEach(b => b.style.display = "block");
+  } else {
+    alert("Contraseña incorrecta");
+  }
+});
+
+// === CARGAR NOTICIAS ===
+async function cargarNoticias() {
+  try {
+    const response = await fetch(NEWS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ categoria: "technology", pageSize: TOTAL })
     });
+    const data = await response.json();
+    noticias = Array.isArray(data.articles) ? data.articles.slice(0, TOTAL) : [];
 
-    loginButton.addEventListener("click", () => {
-      const val = document.getElementById("adminPass").value;
-      if (val === ADMIN_PASSWORD) {
-        esAdmin = true;
-        adminStatus.innerHTML = "<span style='color:green'>Modo admin activado ✅</span>";
-        document.querySelectorAll(".regenerar-btn").forEach(b => b.style.display = "block");
-      } else {
-        alert("Contraseña incorrecta");
-      }
+    if (noticias.length === 0) {
+      document.getElementById("noticias").innerHTML = "<p>No hay noticias disponibles.</p>";
+      return;
+    }
+
+    for (let i = 0; i < TOTAL; i++) {
+      const cont = document.getElementById(`n${i + 1}`);
+      const art = noticias[i];
+      cont.innerHTML = crearPlantillaNoticia(art, i);
+
+      const resumenDiv = cont.querySelector(".resumen");
+      encolarResumen(getTexto(art), resumenDiv);
+
+      const btn = cont.querySelector(".regenerar-btn");
+      btn.addEventListener("click", () => regenerarNoticia(i + 1));
+    }
+  } catch (err) {
+    console.error("Error al cargar noticias:", err);
+  }
+}
+
+function crearPlantillaNoticia(art, index) {
+  const img = art && art.urlToImage ? `<img src="${art.urlToImage}" alt="Imagen">` : "";
+  const title = art && art.title ? art.title : "Sin título";
+  const desc = art && (art.description || art.content) ? (art.description || art.content) : "Sin descripción disponible.";
+  const url = art && art.url ? art.url : "#";
+  return `
+    ${img}
+    <div class="titulo">${escapeHtml(title)}</div>
+    <div class="descripcion">${escapeHtml(desc)}</div>
+    <div class="resumen"><em>Generando resumen...</em></div>
+    <a class="enlace" href="${url}" target="_blank" rel="noopener">Leer más</a>
+    <button class="regenerar-btn" style="display:none;">Regenerar</button>
+  `;
+}
+
+function getTexto(art) {
+  return art && (art.description || art.content || art.title) ? (art.description || art.content || art.title) : "";
+}
+
+// === GESTIÓN DE COLA Y COOLDOWN ===
+function encolarResumen(texto, destino) {
+  colaResumenes.push({ texto, destino });
+  if (!procesandoCola) procesarCola();
+}
+
+async function procesarCola() {
+  procesandoCola = true;
+  while (colaResumenes.length > 0) {
+    const ahora = Date.now();
+    const tiempoDesdeUltima = ahora - ultimaPeticion;
+
+    if (tiempoDesdeUltima < COOLDOWN_MS) {
+      await new Promise(r => setTimeout(r, COOLDOWN_MS - tiempoDesdeUltima));
+    }
+
+    const { texto, destino } = colaResumenes.shift();
+    await generarResumen(texto, destino);
+
+    ultimaPeticion = Date.now();
+  }
+  procesandoCola = false;
+}
+
+async function generarResumen(texto, destino) {
+  try {
+    if (!texto || texto.trim().length === 0) {
+      destino.textContent = "No hay texto para resumir.";
+      return;
+    }
+    const prompt = `Resume brevemente el siguiente texto de una noticia tecnológica en español:\n\n${texto}`;
+    const resp = await fetch(GEMINI_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
     });
+    const data = await resp.json();
+    const resumen = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    destino.textContent = resumen || "No se pudo generar el resumen.";
+  } catch (err) {
+    destino.textContent = "Error al generar resumen.";
+  }
+}
 
-    // === CARGAR NOTICIAS ===
-    async function cargarNoticias() {
-      try {
-        const response = await fetch(NEWS_API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ categoria: "technology", pageSize: TOTAL })
-        });
-        const data = await response.json();
-        noticias = Array.isArray(data.articles) ? data.articles.slice(0, TOTAL) : [];
+// === FUNCIONES EXTRA ===
+function regenerarNoticia(indice) {
+  if (!esAdmin) {
+    alert("Solo el admin puede regenerar noticias.");
+    return;
+  }
 
-        if (noticias.length === 0) {
-          document.getElementById("noticias").innerHTML = "<p>No hay noticias disponibles.</p>";
-          return;
-        }
+  const actual = document.getElementById(`n${indice}`);
+  if (!actual) return;
+  actual.remove();
 
-        for (let i = 0; i < TOTAL; i++) {
-          const cont = document.getElementById(`n${i + 1}`);
-          const art = noticias[i];
-          cont.innerHTML = crearPlantillaNoticia(art, i);
-
-          const resumenDiv = cont.querySelector(".resumen");
-          generarResumen(getTexto(art), resumenDiv);
-
-          const btn = cont.querySelector(".regenerar-btn");
-          btn.addEventListener("click", () => regenerarNoticia(i + 1));
-        }
-      } catch (err) {
-        console.error("Error al cargar noticias:", err);
-      }
+  for (let i = VISIBLES + 1; i <= TOTAL; i++) {
+    const siguiente = document.getElementById(`n${i}`);
+    if (siguiente && siguiente.style.display === "none") {
+      siguiente.style.display = "block";
+      return;
     }
+  }
 
-    function crearPlantillaNoticia(art, index) {
-      const img = art && art.urlToImage ? `<img src="${art.urlToImage}" alt="Imagen">` : "";
-      const title = art && art.title ? art.title : "Sin título";
-      const desc = art && (art.description || art.content) ? (art.description || art.content) : "Sin descripción disponible.";
-      const url = art && art.url ? art.url : "#";
-      return `
-        ${img}
-        <div class="titulo">${escapeHtml(title)}</div>
-        <div class="descripcion">${escapeHtml(desc)}</div>
-        <div class="resumen"><em>Generando resumen...</em></div>
-        <a class="enlace" href="${url}" target="_blank" rel="noopener">Leer más</a>
-        <button class="regenerar-btn" style="display:none;">Regenerar</button>
-      `;
-    }
+  alert("No hay más noticias para mostrar.");
+}
 
-    function getTexto(art) {
-      return art && (art.description || art.content || art.title) ? (art.description || art.content || art.title) : "";
-    }
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
-    async function generarResumen(texto, destino) {
-      try {
-        if (!texto || texto.trim().length === 0) {
-          destino.textContent = "No hay texto para resumir.";
-          return;
-        }
-        const prompt = `Resume brevemente el siguiente texto de una noticia tecnológica en español:\n\n${texto}`;
-        const resp = await fetch(GEMINI_API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-        });
-        const data = await resp.json();
-        const resumen = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-        destino.textContent = resumen || "No se pudo generar el resumen.";
-      } catch (err) {
-        destino.textContent = "Error al generar resumen.";
-      }
-    }
-
-    function regenerarNoticia(indice) {
-      if (!esAdmin) {
-        alert("Solo el admin puede regenerar noticias.");
-        return;
-      }
-
-      const actual = document.getElementById(`n${indice}`);
-      if (!actual) return;
-      actual.remove();
-
-      for (let i = VISIBLES + 1; i <= TOTAL; i++) {
-        const siguiente = document.getElementById(`n${i}`);
-        if (siguiente && siguiente.style.display === "none") {
-          siguiente.style.display = "block";
-          return;
-        }
-      }
-
-      alert("No hay más noticias para mostrar.");
-    }
-
-    function escapeHtml(str) {
-      if (!str) return "";
-      return String(str)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    // Inicia carga de noticias (asíncrona)
-
-    cargarNoticias();
-
+// === Inicio ===
+cargarNoticias();
