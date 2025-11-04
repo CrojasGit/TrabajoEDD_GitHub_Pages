@@ -1,20 +1,21 @@
-PLANIFICACIÓN:
+##PLANIFICACIÓN:##
 
-Bienvenid@ al readme de nuestro proyecto, para empezar vamos a declarar las temáticas elegidas, en primer lugar encontramos las noticias, y en segundo la inteligencia artificial, para hacer trabajar ambas temáticas de manera conjunta formaremos una página web en GitHub Pages en la cual diariamente aparezcan un conjunto de las noticias del día, pero siendo estas redactadas por un modelo de lenguaje de IA (un LLM).
+Bienvenid@ al readme de nuestro proyecto, la temática de nuestro proyecto consistirá en formar una página web e GitHub Pages en la cual diariamente aparecen cinco nuevas noticas sobre tecnología al día, pero siendo  estas redactadas por un modelo de lenguaje de IA (un LLM).
 
 En segundo lugar, en cuanto a los usuarios que podrán encontrarse en la web encontramos principalmente al usuario base, el cual consulta la web de manera informativa y sin permisos de cambiar nada, en cuanto al otro usuario (administrador) este al identificarse en la web tendrá la capacidad exclusiva de regenerar las noticias del día.
 
-En cuanto a los requisitos de la web, en primer lugar necesitamos que el usuario final tenga acceso a las noticias generadas (siendo regeneradas cada día), seguidamente, que el administrador pueda regenerar las noticias de ese día si así lo desea y en 3.er lugar, que el servidor regenere las noticias diariamente de manera automática.
+En cuanto a los requisitos de la web, en primer lugar necesitamos que el usuario final tenga acceso a las noticias generadas, y en segundo lugar, que el servidor regenere las noticias diariamente de manera automática. Y en tercer lugar, que muestre un mensaje nuevo cada día, y que se regenere automáticamente.
 
 DISEÑO:
 
 Para este proyecto, vamos a usar la arquitectura cliente-servidor, permitiendo así la comunicación entre usuario y la página web alojada en el servidor de GitHub Pages.
 
-En cuanto al cliente, encontramos que se divide en 2 ramas, el primero sería el usuario base, el cual no puede modificar ningún aspecto de la página ni modificar ningún dato del servidor y en segundo lugar tenemos al administrador, este sí que puede hacer cambios/modificaciones en la página web, teniendo un botón para regenerar las noticias del día.
-
+En la fase de diseño definios a los usuarios, encontramos que se divide en 2 ramas, el primero sería el usuario base, el cual no puede modificar ningún aspecto de la página ni modificar ningún dato del servidor y en segundo lugar tenemos al administrador, este sí que puede hacer cambios/modificaciones en la página web, teniendo un botón para regenerar las noticias del día. 
 Respecto al servidor, este, recibirá las solicitudes de los usuarios y otorgará una respuesta en función del tipo de usuario que se esté comunicando con él.
 
--Despliegue: A la hora de hacer el deploy hay muchos factores que pueden generar errores, sobre todo en lo que se refiere al workflow y hacer funcionar las API keys de manera segura, esto puede llegar a ser frustrante y apoteósico, puesto que llega un momento en el que se pruebe lo que se pruebe acaba dando error. Ademas, la gestion de los workflows de GitHub es confusa y liosa, haciendo que para algunos propositos sea mas util emplear una proxy o servidor externo para conseguir lo que queremos.
+Para desarrollar la págia web de noticias usamos las siguientes APIs: New Api, Gemini, una API de Google para que la tipogragiá de web sea fuente Roboto. Además nos  apoyamos en GhatGPT Plus, Gemini y Claude, para desarrollar el diseño de la página y la interconectividad de APIs. Finalmente, para que la página hiciera consultas a las APIs, usamos Deno DePloy y Clauser a modo de proxy. 
+
+-Despliegue: cada vez que quieres hacer una consulta a la API el deploy tarda aproximadamente 30 segundos A la hora de hacer el deploy hay muchos factores que pueden generar errores, sobre todo en lo que se refiere al workflow y hacer funcionar las API keys de manera segura, esto puede llegar a ser frustrante y apoteósico, puesto que llega un momento en el que se pruebe lo que se pruebe acaba dando error. Ademas, la gestion de los workflows de GitHub es confusa y liosa, haciendo que para algunos propositos sea mas util emplear una proxy o servidor externo para conseguir lo que queremos.
 
 -Mantenimiento: Puesto que en primer lugar teníamos la idea de usar Unity con su opción de generar una build para WebGL, tuvimos que enfrentar varios problemas, el primero, aprender a llamar una función de JavaScript desde Unity, en segundo lugar, a la hora de subir el proyecto a GitHub, este no permite la subida de archivos mayores de 25MB, y el archivo más pesado de la demo técnica del proyecto ya pesaba más de 40MB, no obstante, Unity te ofrece opciones para que se compriman los archivos y se descompriman en directo a la hora de su ejecución, al probar esto, se podía subir el proyecto a GitHub, pero al cargar el juego/entorno de Unity la web crasheaba por falta de memoria. Una solución pudo haber sido subir el juego a otro servidor como por ejemplo itch.io, pero al hacer esto e intentar mostrar el juego desde una web de GitHub Pages el juego no se mostraba, ya que itch.io no permite este tipo de interacción por políticas de empresa, haciendo que hayamos tenido que cambiar de proyecto a uno totalmente diferente del que teníamos en mente.
 
