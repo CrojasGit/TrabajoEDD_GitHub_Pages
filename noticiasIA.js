@@ -430,7 +430,7 @@ async function generarResumen(texto, destino) {
       destino.textContent = "No hay texto para resumir.";
       return;
     }
-    const prompt = `Resume brevemente el siguiente texto de una noticia tecnológica en inglés:\n\n${texto}`;
+    const prompt = `Briefly summarize the following technology news text in English:\n\n${texto}`;
     const resp = await fetch(GEMINI_API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -478,6 +478,7 @@ function escapeHtml(str) {
 
 // === Inicio ===
 cargarNoticias();
+
 
 
 
