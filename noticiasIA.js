@@ -16,8 +16,10 @@ const colaResumenes = [];
 let procesandoCola = false;
 
 // Fecha automática
-document.getElementById('fecha').textContent = new Date().toLocaleDateString('en-US',{
-  weekday:'long',day:'2-digit',month:'long',year:'numeric'
+document.getElementById('fecha').textContent = new Date().toLocaleDateString('es-ES', {
+  day: '2-digit',
+  month: '2-digit',
+  year: '2-digit'
 });
 
 // === Frases del año ===
@@ -478,6 +480,7 @@ function escapeHtml(str) {
 
 // === Inicio ===
 cargarNoticias();
+
 
 
 
