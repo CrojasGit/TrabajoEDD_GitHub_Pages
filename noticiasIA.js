@@ -332,7 +332,7 @@ loginButton.addEventListener("click", () => {
   const val = document.getElementById("adminPass").value;
   if (val === ADMIN_PASSWORD) {
     esAdmin = true;
-    adminStatus.innerHTML = "<span style='color:green'>Modo admin activado ✅</span>";
+    adminStatus.innerHTML = "<span style='color:green'></span>";
     document.querySelectorAll(".regenerar-btn").forEach(b => b.style.display = "block");
   } else {
     alert("Contraseña incorrecta");
@@ -479,6 +479,7 @@ function escapeHtml(str) {
 
 // === Inicio ===
 cargarNoticias();
+
 
 
 
