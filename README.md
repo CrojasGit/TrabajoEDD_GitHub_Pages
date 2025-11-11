@@ -68,3 +68,7 @@ Esta mejora se origina del problema de que cuando usamos la vista de admin y reg
 
 El modo admin que tenemos implementado solamente elimina divs y muestra el siguiente dentro de la lista. El problema es que este cambio no solo no es permanente, sino que además ocurre solo a nivel local, sería correcto trabajar en hacer que los cambios sean universales y permanentes hasta que las noticias se actualicen
 
+#### Imágenes sin mutilar
+<hr>
+
+Para mantener una coherencia con la web, nos hemos visto obligados a transformar todas las imágenes que nos proporciona newsAPI a un tamaño y formato en concreto. Esto nos ayuda a mantener una buena estética, pero al mismo tiempo, como este proceso es automático, hay imágenes que al cortarse pierden significado/se dejan de ver bien. Lo cual puede resultar en una peor experiencia de usuario y sería una buena idea tratar de mejorar este aspecto.
