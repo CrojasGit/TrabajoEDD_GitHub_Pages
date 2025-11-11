@@ -1,21 +1,74 @@
-PLANIFICACIÓN:
+# README GITHUB PAGES [IA NEWSROOM]
+<hr>
 
-Bienvenid@ al readme de nuestro proyecto, para empezar vamos a declarar las temáticas elegidas, en primer lugar encontramos las noticias, y en segundo la inteligencia artificial, para hacer trabajar ambas temáticas de manera conjunta formaremos una página web en GitHub Pages en la cual diariamente aparezcan un conjunto de las noticias del día, pero siendo estas redactadas por un modelo de lenguaje de IA (un LLM).
+## Planificacion
+
+<hr>
+
+Bienvenid@ al readme de nuestro proyecto, la temática de nuestro proyecto consistirá en formar una página web en GitHub Pages en la cual diariamente aparecen cinco nuevas noticias sobre tecnología al día, pero siendo estas redactadas por un modelo de lenguaje de IA (un LLM).
 
 En segundo lugar, en cuanto a los usuarios que podrán encontrarse en la web encontramos principalmente al usuario base, el cual consulta la web de manera informativa y sin permisos de cambiar nada, en cuanto al otro usuario (administrador) este al identificarse en la web tendrá la capacidad exclusiva de regenerar las noticias del día.
 
-En cuanto a los requisitos de la web, en primer lugar necesitamos que el usuario final tenga acceso a las noticias generadas (siendo regeneradas cada día), seguidamente, que el administrador pueda regenerar las noticias de ese día si así lo desea y en 3.er lugar, que el servidor regenere las noticias diariamente de manera automática.
+En cuanto a los requisitos de la web, en primer lugar necesitamos que el usuario final tenga acceso a las noticias generadas, y en segundo lugar, que el servidor regenere las noticias diariamente de manera automática. Y en tercer lugar, que muestre un mensaje nuevo cada día, y que se regenere automáticamente.
 
-DISEÑO:
+<hr>
+
+### DISEÑO:
+<hr>
+
 
 Para este proyecto, vamos a usar la arquitectura cliente-servidor, permitiendo así la comunicación entre usuario y la página web alojada en el servidor de GitHub Pages.
 
-En cuanto al cliente, encontramos que se divide en 2 ramas, el primero sería el usuario base, el cual no puede modificar ningún aspecto de la página ni modificar ningún dato del servidor y en segundo lugar tenemos al administrador, este sí que puede hacer cambios/modificaciones en la página web, teniendo un botón para regenerar las noticias del día.
-
+En la fase de diseño definimos a los usuarios, encontramos que se divide en 2 ramas, el primero sería el usuario base, el cual no puede modificar ningún aspecto de la página ni modificar ningún dato del servidor y en segundo lugar tenemos al administrador, este sí que puede hacer cambios/modificaciones en la página web, teniendo un botón para regenerar las noticias del día. 
 Respecto al servidor, este, recibirá las solicitudes de los usuarios y otorgará una respuesta en función del tipo de usuario que se esté comunicando con él.
 
--Despliegue: A la hora de hacer el deploy hay muchos factores que pueden generar errores, sobre todo en lo que se refiere al workflow y hacer funcionar las API keys de manera segura, esto puede llegar a ser frustrante y apoteósico, puesto que llega un momento en el que se pruebe lo que se pruebe acaba dando error. Ademas, la gestion de los workflows de GitHub es confusa y liosa, haciendo que para algunos propositos sea mas util emplear una proxy o servidor externo para conseguir lo que queremos.
+Para desarrollar la página web de noticias usamos las siguientes APIs: NewsApi, Gemini y una API de Google para que la tipografía de web sea fuente Roboto. Además, nos  apoyamos en ChatGPT Plus, Gemini y Claude, para potenciar, mejorar y desarrollar el diseño de la página, así como interconectividad de APIs. Finalmente, para que la página hiciera consultas a las APIs, usamos Deno DePloy y Cloudflare a modo de proxy (por alguna razón una parte de lo que teníamos en Cloudflare dejo de funcionar y tuvimos que traspasar esa parte a Deno DePloy). 
 
--Mantenimiento: Puesto que en primer lugar teníamos la idea de usar Unity con su opción de generar una build para WebGL, tuvimos que enfrentar varios problemas, el primero, aprender a llamar una función de JavaScript desde Unity, en segundo lugar, a la hora de subir el proyecto a GitHub, este no permite la subida de archivos mayores de 25MB, y el archivo más pesado de la demo técnica del proyecto ya pesaba más de 40MB, no obstante, Unity te ofrece opciones para que se compriman los archivos y se descompriman en directo a la hora de su ejecución, al probar esto, se podía subir el proyecto a GitHub, pero al cargar el juego/entorno de Unity la web crasheaba por falta de memoria. Una solución pudo haber sido subir el juego a otro servidor como por ejemplo itch.io, pero al hacer esto e intentar mostrar el juego desde una web de GitHub Pages el juego no se mostraba, ya que itch.io no permite este tipo de interacción por políticas de empresa, haciendo que hayamos tenido que cambiar de proyecto a uno totalmente diferente del que teníamos en mente.
+<hr>
 
-Por otra parte, respecto del uso y proteccion de las api keys, encontramos que con lo confuso que resulta la gestion de los workflows y secretos de GitHub, es mas sencillo usar una proxy, para este proposito. No obstante, una proxy no es la solucion definitiva, porque tenemos que tener en cuenta un dato que inicialmente no conociamos: si de alguna manera la api key llega al navegador, esta se puede llegar a ver comprometida (por mucho que llegue cifrada). Esto nos ha obligado a cambiar la manera en la que gestionamos el manejo de la api, sobretodo la de gemini, la cual es la mas delicada dentro del proyecto. En primer lugar, queriamos usar la proxy como host de la api key y consultar la api key de la proxy cuando fuese necesario. No obstante, por el dato comentado previamente, este metodo no era correcto. En su lugar nos hemos vistos obligados a hacer el uso de la api key desde la proxy, para ello, hemos ideado una demo tecnica, en la que un usuario comparte un prompt a la proxy, esta proxy envia el prompt a gemini, y gemini devuelve una respuesta a la proxy la cual a su vez, la proxy redirige a la web. Esto nos garantiza que podremos emplear gemini de manera segura dentro de nuestro proyecto. PD: Para proteger a la api key de llamadas excesivas, desde la proxy he limitado el acceso de las llamadas a solamente las que provienen de la cuenta de GitHub CrojasGit.
+### Despliegue:
+<hr>
+
+cada vez que quieres hacer una consulta a la API, el deploy tarda aproximadamente 30 segundos. A la hora de hacer el deploy hay muchos factores que pueden generar errores, sobre todo en lo que se refiere al workflow y hacer funcionar las API keys de manera segura, esto puede llegar a ser frustrante y apoteósico, puesto que llega un momento en el que se pruebe lo que se pruebe acaba dando error. Además, la gestión de los workflows de GitHub es confusa y liosa, haciendo que para algunos propósitos sea más útil emplear una proxy o servidor externo para conseguir lo que queremos.
+<hr>
+
+### Mantenimiento:
+<hr>
+
+#### Unity
+<hr>
+
+Puesto que en primer lugar teníamos la idea de usar Unity con su opción de generar una build para WebGL, tuvimos que enfrentar varios problemas, el primero, aprender a llamar una función de JavaScript desde Unity, en segundo lugar, a la hora de subir el proyecto a GitHub, este no permite la subida de archivos mayores de 25MB, y el archivo más pesado de la demo técnica del proyecto ya pesaba más de 40MB, no obstante, Unity te ofrece opciones para que se compriman los archivos a la hora de generar la build, y que estos se descompriman en directo a la hora de su ejecución, al probar esto, se podía subir el proyecto a GitHub, pero al cargar el juego/entorno de Unity la web crasheaba por falta de memoria. Una solución pudo haber sido subir el juego a otro servidor como por ejemplo itch.io, pero al hacer esto e intentar mostrar el juego desde una web de GitHub Pages el juego no se mostraba, ya que itch.io no permite este tipo de interacción por políticas de empresa, haciendo que hayamos tenido que cambiar de proyecto a uno totalmente diferente del que teníamos en mente en un principio.
+
+#### Protección APIs
+<hr>
+
+Por otra parte, respecto del uso y protección de las API keys, encontramos que con lo confuso que resulta la gestión de los workflows y secretos de GitHub, es más sencillo usar una proxy, para este propósito. No obstante, una proxy no es la solución definitiva, porque tenemos que tener en cuenta un dato que inicialmente no conocíamos: si de alguna manera la API key llega al navegador, esta se puede llegar a ver comprometida (por mucho que llegue cifrada). Esto nos ha obligado a cambiar la manera en la que gestionamos el manejo de la API, sobre todo la de Gemini, la cual es la más delicada dentro del proyecto. En primer lugar, queríamos usar la proxy como host de la API key y consultar la API key de la proxy cuando fuese necesario. No obstante, por el dato comentado previamente, este método no era correcto. En su lugar nos hemos visto obligados a hacer el uso de la API key desde la proxy, para ello, hemos ideado una demo técnica, en la que un usuario comparte un prompt a la proxy, esta proxy envía el prompt a Gemini, y este devuelve una respuesta a la proxy la cual a su vez, la proxy redirige a la web. Esto nos garantiza que podremos emplear Gemini de manera segura dentro de nuestro proyecto. La demo técnica es la que hay publicada y explicada paso a paso en el Classroom de 1.º de DAM de EDD. PD: Para proteger a la API key de llamadas excesivas, desde la proxy hemos limitado el acceso de las llamadas a solamente las que provienen de la cuenta de GitHub CrojasGit.
+
+#### Traducción al inglés
+<hr>
+
+Más adelante, una vez ya teníamos la interconexión de apis (newsAPI y Gemini) estuvimos trabajando en la integración de ambas partes del proyecto (el script con las funcionalidades y el .html con todo el diseño) y cuando ya habíamos terminado nos dimos cuenta de que hay veces que newsAPI nos devolvía noticias en inglés (esto lo habíamos puesto para suplementar en caso necesario la cadencia de noticias en español), el problema era que esto pasaba mucho, por lo tanto, con tal de mantener una coherencia dentro de la página hemos tenido que pasarlo todo a inglés (nunca hay cadencia de noticias en inglés, al contrario que en español dentro de la API). Esto significa, traducir toda la pool de frases del día, todos los placeholders, todos los pequeños textos, hacer que el resumen se genere en inglés, etc.
+
+### Futuras mejoras:
+<hr>
+
+#### Responsive
+<hr>
+
+Nuestra web solo se muestra correctamente si entramos desde una pantalla de escritorio, es decir, al entrar desde un smartphone o una tablet la web se ve mal y esto sería importante mejorarlo para que todos los que accedan a la web puedan disfrutar de una buena experiencia de usuario
+
+#### Links erróneos
+<hr>
+
+Esta mejora se origina del problema de que cuando usamos la vista de admin y regeneramos una noticia, los botones de dirección a cada noticia (1, 2, 3, 4 ,5) dejan de funcionar correctamente debido a que el orden de los divs y sus respectivos id no es el indicado en cada botón para dirigirse a la respectiva noticia
+
+#### Modo admin de verdad
+<hr>
+
+El modo admin que tenemos implementado solamente elimina divs y muestra el siguiente dentro de la lista. El problema es que este cambio no solo no es permanente, sino que además ocurre solo a nivel local, sería correcto trabajar en hacer que los cambios sean universales y permanentes hasta que las noticias se actualicen
+
+#### Imágenes sin mutilar
+<hr>
+
+Para mantener una coherencia con la web, nos hemos visto obligados a transformar todas las imágenes que nos proporciona newsAPI a un tamaño y formato en concreto. Esto nos ayuda a mantener una buena estética, pero al mismo tiempo, como este proceso es automático, hay imágenes que al cortarse pierden significado/se dejan de ver bien. Lo cual puede resultar en una peor experiencia de usuario y sería una buena idea tratar de mejorar este aspecto.
