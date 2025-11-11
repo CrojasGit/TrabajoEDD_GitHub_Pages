@@ -49,3 +49,22 @@ Por otra parte, respecto del uso y protección de las API keys, encontramos que 
 <hr>
 
 Más adelante, una vez ya teníamos la interconexión de apis (newsAPI y Gemini) estuvimos trabajando en la integración de ambas partes del proyecto (el script con las funcionalidades y el .html con todo el diseño) y cuando ya habíamos terminado nos dimos cuenta de que hay veces que newsAPI nos devolvía noticias en inglés (esto lo habíamos puesto para suplementar en caso necesario la cadencia de noticias en español), el problema era que esto pasaba mucho, por lo tanto, con tal de mantener una coherencia dentro de la página hemos tenido que pasarlo todo a inglés (nunca hay cadencia de noticias en inglés, al contrario que en español dentro de la API). Esto significa, traducir toda la pool de frases del día, todos los placeholders, todos los pequeños textos, hacer que el resumen se genere en inglés, etc.
+
+### Futuras mejoras:
+<hr>
+
+#### Responsive
+<hr>
+
+Nuestra web solo se muestra correctamente si entramos desde una pantalla de escritorio, es decir, al entrar desde un smartphone o una tablet la web se ve mal y esto sería importante mejorarlo para que todos los que accedan a la web puedan disfrutar de una buena experiencia de usuario
+
+#### Links erróneos
+<hr>
+
+Esta mejora se origina del problema de que cuando usamos la vista de admin y regeneramos una noticia, los botones de dirección a cada noticia (1, 2, 3, 4 ,5) dejan de funcionar correctamente debido a que el orden de los divs y sus respectivos id no es el indicado en cada botón para dirigirse a la respectiva noticia
+
+#### Modo admin de verdad
+<hr>
+
+El modo admin que tenemos implementado solamente elimina divs y muestra el siguiente dentro de la lista. El problema es que este cambio no solo no es permanente, sino que además ocurre solo a nivel local, sería correcto trabajar en hacer que los cambios sean universales y permanentes hasta que las noticias se actualicen
+
