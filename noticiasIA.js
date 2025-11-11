@@ -16,7 +16,7 @@ const colaResumenes = [];
 let procesandoCola = false;
 
 // Fecha automática
-document.getElementById('fecha').textContent = new Date().toLocaleDateString('en-ES',{
+document.getElementById('fecha').textContent = new Date().toLocaleDateString('en-US',{
   weekday:'long',day:'2-digit',month:'long',year:'numeric'
 });
 
@@ -478,6 +478,7 @@ function escapeHtml(str) {
 
 // === Inicio ===
 cargarNoticias();
+
 
 
 
