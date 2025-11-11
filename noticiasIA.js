@@ -388,8 +388,8 @@ function crearPlantillaNoticia(art, index) {
         <div class="titulo">${escapeHtml(title)}</div>
         <div class="descripcion">${escapeHtml(desc)}</div>
         <div class="resumen"><em>Generating summary...</em></div>
-        <a class="enlace" href="${url}" target="_blank" rel="noopener">Leer más</a>
-        <button class="regenerar-btn" style="display:none;">Regenerar</button>
+        <a class="enlace" href="${url}" target="_blank" rel="noopener">See more</a>
+        <button class="regenerar-btn" style="display:none;">Respawn</button>
       </div>
       ${img}
     </div>
@@ -479,6 +479,7 @@ function escapeHtml(str) {
 
 // === Inicio ===
 cargarNoticias();
+
 
 
 
