@@ -2,14 +2,13 @@
 <hr>
 
 ## Planificación
-
 <hr>
 
-Bienvenid@ al readme de nuestro proyecto, la temática de nuestro proyecto consistirá en formar una página web en GitHub Pages en la cual diariamente aparecen cinco nuevas noticias sobre tecnología al día, pero siendo estas redactadas por un modelo de lenguaje de IA (un LLM).
+Bienvenid@ al readme de nuestro proyecto, la temática de nuestro proyecto consistirá en formar una página web en GitHub Pages en la cual diariamente aparecen cinco nuevas noticias sobre tecnología, pero siendo estas redactadas por un modelo de lenguaje de IA (un LLM).
 
 En segundo lugar, en cuanto a los usuarios que podrán encontrarse en la web encontramos principalmente al usuario base, el cual consulta la web de manera informativa y sin permisos de cambiar nada, en cuanto al otro usuario (administrador) este al identificarse en la web tendrá la capacidad exclusiva de regenerar las noticias del día.
 
-En cuanto a los requisitos de la web, en primer lugar necesitamos que el usuario final tenga acceso a las noticias generadas,  en segundo lugar, que el servidor regenere las noticias diariamente de manera automática. En tercer lugar, que muestre un mensaje nuevo cada día, y que se regenere automáticamente.
+En cuanto a los requisitos de la web, en primer lugar necesitamos que el usuario final tenga acceso a las noticias generadas,  en segundo lugar, que el servidor regenere las noticias diariamente de manera automática, en tercer lugar, que muestre un mensaje nuevo cada día, y que se regenere automáticamente.
 
 <hr>
 
@@ -32,7 +31,7 @@ Para desarrollar la página web de noticias usamos las siguientes APIs: NewsApi,
 #### Pequeña molestia
 <hr>
 
-Cada vez que queriamos actualizar el proyecto, por ejemplo para crear el proceso hacer una consulta a la API, el deploy tarda aproximadamente 30 segundos. Además, a la hora de hacer el deploy hay muchos factores que pueden generar errores, sobre todo en lo que se refiere al workflow y hacer funcionar las API keys de manera segura, esto puede llegar a ser frustrante y apoteósico, puesto que llega un momento en el que se pruebe lo que se pruebe acaba dando error. Además, la gestión de los workflows de GitHub es confusa, haciendo que para algunos propósitos sea más útil emplear una proxy o servidor externo para conseguir lo que queremos.
+Cada vez que queríamos actualizar el proyecto, por ejemplo para crear el proceso de hacer una consulta a la API, el deploy tarda aproximadamente 30 segundos. Además, a la hora de hacer el deploy hay muchos factores que pueden generar errores, sobre todo en lo que se refiere al workflow y hacer funcionar las API keys de manera segura, esto puede llegar a ser frustrante y apoteósico, puesto que llega un momento en el que se pruebe lo que se pruebe acaba dando error. Además, la gestión de los workflows de GitHub es confusa, haciendo que para algunos propósitos sea más útil emplear una proxy o servidor externo para conseguir lo que queremos.
 <hr>
 
 
