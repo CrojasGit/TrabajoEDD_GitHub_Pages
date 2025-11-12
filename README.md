@@ -29,6 +29,9 @@ Para desarrollar la página web de noticias usamos las siguientes APIs: NewsApi,
 ### Despliegue:
 <hr>
 
+#### Pequeña molestia
+<hr>
+
 Cada vez que quieres hacer una consulta a la API, el deploy tarda aproximadamente 30 segundos. A la hora de hacer el deploy hay muchos factores que pueden generar errores, sobre todo en lo que se refiere al workflow y hacer funcionar las API keys de manera segura, esto puede llegar a ser frustrante y apoteósico, puesto que llega un momento en el que se pruebe lo que se pruebe acaba dando error. Además, la gestión de los workflows de GitHub es confusa, haciendo que para algunos propósitos sea más útil emplear una proxy o servidor externo para conseguir lo que queremos.
 <hr>
 
@@ -39,13 +42,15 @@ Cada vez que quieres hacer una consulta a la API, el deploy tarda aproximadament
 Por otra parte, respecto del uso y protección de las API keys, encontramos que con lo confuso que resulta la gestión de los workflows y secretos de GitHub, es más sencillo usar una proxy, para este propósito. No obstante, una proxy no es la solución definitiva, porque tenemos que tener en cuenta un dato que inicialmente no conocíamos: si de alguna manera la API key llega al navegador, esta se puede llegar a ver comprometida (por mucho que llegue cifrada). Esto nos ha obligado a cambiar la manera en la que gestionamos el manejo de la API, sobre todo la de Gemini, la cual es la más delicada dentro del proyecto. En primer lugar, queríamos usar la proxy como host de la API key y consultar la API key de la proxy cuando fuese necesario. No obstante, por el dato comentado previamente, este método no era correcto. En su lugar nos hemos visto obligados a hacer el uso de la API key desde la proxy, para ello, hemos ideado una demo técnica, en la que un usuario comparte un prompt a la proxy, esta proxy envía el prompt a Gemini, y este devuelve una respuesta a la proxy la cual a su vez, la proxy redirige a la web. Esto nos garantiza que podremos emplear Gemini de manera segura dentro de nuestro proyecto. La demo técnica es la que hay publicada y explicada paso a paso en el Classroom de 1.º de DAM de EDD. PD: Para proteger a la API key de llamadas excesivas, desde la proxy hemos limitado el acceso de las llamadas a solamente las que provienen de la cuenta de GitHub CrojasGit.
 <hr>
 
+#### Unity WebGL
+<hr>
+
+Puesto que en primer lugar teníamos la idea de usar Unity con su opción de generar una build para WebGL, tuvimos que enfrentar varios problemas, el primero, aprender a llamar una función de JavaScript desde Unity. En segundo lugar, a la hora de subir el proyecto a GitHub, este no permite la subida de archivos mayores de 25MB, y el archivo más pesado de la demo técnica del proyecto ya pesaba más de 40MB, no obstante, Unity te ofrece opciones para que se compriman los archivos a la hora de generar la build, y que estos se descompriman en directo a la hora de su ejecución, al probar esto, se podía subir el proyecto a GitHub, pero al cargar el juego/entorno de Unity la web crasheaba por falta de memoria. Una solución pudo haber sido subir el juego a otro servidor como por ejemplo itch.io, pero al hacer esto e intentar mostrar el juego desde una web de GitHub Pages el juego no se mostraba, ya que itch.io no permite este tipo de interacción por políticas de empresa, haciendo que hayamos tenido que cambiar de proyecto a uno totalmente diferente del que teníamos en mente en un principio.
+
 ### Mantenimiento:
 <hr>
 
-#### Unity
-<hr>
 
-Puesto que en primer lugar teníamos la idea de usar Unity con su opción de generar una build para WebGL, tuvimos que enfrentar varios problemas, el primero, aprender a llamar una función de JavaScript desde Unity, en segundo lugar, a la hora de subir el proyecto a GitHub, este no permite la subida de archivos mayores de 25MB, y el archivo más pesado de la demo técnica del proyecto ya pesaba más de 40MB, no obstante, Unity te ofrece opciones para que se compriman los archivos a la hora de generar la build, y que estos se descompriman en directo a la hora de su ejecución, al probar esto, se podía subir el proyecto a GitHub, pero al cargar el juego/entorno de Unity la web crasheaba por falta de memoria. Una solución pudo haber sido subir el juego a otro servidor como por ejemplo itch.io, pero al hacer esto e intentar mostrar el juego desde una web de GitHub Pages el juego no se mostraba, ya que itch.io no permite este tipo de interacción por políticas de empresa, haciendo que hayamos tenido que cambiar de proyecto a uno totalmente diferente del que teníamos en mente en un principio.
 
 
 #### Traducción al inglés
