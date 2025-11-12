@@ -32,14 +32,14 @@ Para desarrollar la página web de noticias usamos las siguientes APIs: NewsApi,
 <hr>
 
 Cada vez que queríamos actualizar el proyecto, por ejemplo para crear el proceso de hacer una consulta a la API, el deploy tarda aproximadamente 30 segundos. Además, a la hora de hacer el deploy hay muchos factores que pueden generar errores, sobre todo en lo que se refiere al workflow y hacer funcionar las API keys de manera segura, esto puede llegar a ser frustrante y apoteósico, puesto que llega un momento en el que se pruebe lo que se pruebe acaba dando error. Además, la gestión de los workflows de GitHub es confusa, haciendo que para algunos propósitos sea más útil emplear una proxy o servidor externo para conseguir lo que queremos.
-<hr>
+
 
 
 #### Protección APIs
 <hr>
 
 Por otra parte, respecto del uso y protección de las API keys, encontramos que con lo confuso que resulta la gestión de los workflows y secretos de GitHub, es más sencillo usar una proxy, para este propósito. No obstante, una proxy no es la solución definitiva, porque tenemos que tener en cuenta un dato que inicialmente no conocíamos: si de alguna manera la API key llega al navegador, esta se puede llegar a ver comprometida (por mucho que llegue cifrada). Esto nos ha obligado a cambiar la manera en la que gestionamos el manejo de la API, sobre todo la de Gemini, la cual es la más delicada dentro del proyecto. En primer lugar, queríamos usar la proxy como host de la API key y consultar la API key de la proxy cuando fuese necesario. No obstante, por el dato comentado previamente, este método no era correcto. En su lugar nos hemos visto obligados a hacer el uso de la API key desde la proxy, para ello, hemos ideado una demo técnica, en la que un usuario comparte un prompt a la proxy, esta proxy envía el prompt a Gemini, y este devuelve una respuesta a la proxy la cual a su vez, la proxy redirige a la web. Esto nos garantiza que podremos emplear Gemini de manera segura dentro de nuestro proyecto. La demo técnica es la que hay publicada y explicada paso a paso en el Classroom de 1.º de DAM de EDD. PD: Para proteger a la API key de llamadas excesivas, desde la proxy hemos limitado el acceso de las llamadas a solamente las que provienen de la cuenta de GitHub CrojasGit.
-<hr>
+
 
 #### Unity WebGL
 <hr>
