@@ -13,7 +13,7 @@ En cuanto a los requisitos de la web, en primer lugar necesitamos que el usuario
 
 <hr>
 
-### DISEÑO:
+### Diseño:
 <hr>
 
 
