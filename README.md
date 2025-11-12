@@ -1,7 +1,7 @@
 # README GITHUB PAGES [IA NEWSROOM]
 <hr>
 
-## Planificacion
+## Planificación
 
 <hr>
 
