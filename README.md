@@ -55,6 +55,7 @@ Puesto que en primer lugar teníamos la idea de usar Unity con su opción de gen
 <hr>
 
 Más adelante, una vez ya teníamos la interconexión de apis (newsAPI y Gemini) estuvimos trabajando en la integración de ambas partes del proyecto (el script con las funcionalidades y el .html con todo el diseño) y cuando ya habíamos terminado nos dimos cuenta de que hay veces que newsAPI nos devolvía noticias en inglés (esto lo habíamos puesto para suplementar en caso necesario, la cadencia de noticias en español), el problema era que esto pasaba mucho, por lo tanto, con tal de mantener una coherencia dentro de la página hemos tenido que pasarlo todo a inglés (nunca hay cadencia de noticias en inglés, al contrario que en español dentro de la API). Esto significa, traducir toda la pool de frases del día, todos los placeholders, todos los pequeños textos, hacer que el resumen se genere en inglés, etc.
+<hr>
 
 #### Futuras mejoras:
 <hr>
