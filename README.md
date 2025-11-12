@@ -32,7 +32,7 @@ Para desarrollar la página web de noticias usamos las siguientes APIs: NewsApi,
 #### Pequeña molestia
 <hr>
 
-Cada vez que quieres hacer una consulta a la API, el deploy tarda aproximadamente 30 segundos. A la hora de hacer el deploy hay muchos factores que pueden generar errores, sobre todo en lo que se refiere al workflow y hacer funcionar las API keys de manera segura, esto puede llegar a ser frustrante y apoteósico, puesto que llega un momento en el que se pruebe lo que se pruebe acaba dando error. Además, la gestión de los workflows de GitHub es confusa, haciendo que para algunos propósitos sea más útil emplear una proxy o servidor externo para conseguir lo que queremos.
+Cada vez que queriamos actualizar el proyecto, por ejemplo para crear el proceso hacer una consulta a la API, el deploy tarda aproximadamente 30 segundos. Además, a la hora de hacer el deploy hay muchos factores que pueden generar errores, sobre todo en lo que se refiere al workflow y hacer funcionar las API keys de manera segura, esto puede llegar a ser frustrante y apoteósico, puesto que llega un momento en el que se pruebe lo que se pruebe acaba dando error. Además, la gestión de los workflows de GitHub es confusa, haciendo que para algunos propósitos sea más útil emplear una proxy o servidor externo para conseguir lo que queremos.
 <hr>
 
 
