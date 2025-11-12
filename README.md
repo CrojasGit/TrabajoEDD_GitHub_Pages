@@ -45,6 +45,7 @@ Por otra parte, respecto del uso y protección de las API keys, encontramos que 
 <hr>
 
 Puesto que en primer lugar teníamos la idea de usar Unity con su opción de generar una build para WebGL, tuvimos que enfrentar varios problemas, el primero, aprender a llamar una función de JavaScript desde Unity. En segundo lugar, a la hora de subir el proyecto a GitHub, este no permite la subida de archivos mayores de 25MB, y el archivo de la demo técnica del proyecto ya pesaba más de 40MB, no obstante, Unity te ofrece opciones para que se compriman los archivos a la hora de generar la build, y que estos se descompriman en directo a la hora de su ejecución, al probar esto, se podía subir el proyecto a GitHub, pero al cargar el juego/entorno de Unity la web crasheaba por falta de memoria. Una solución pudo haber sido subir el juego a otro servidor como por ejemplo itch.io, pero al hacer esto e intentar mostrar el juego desde una web de GitHub Pages el juego no se mostraba, ya que itch.io no permite este tipo de interacción por políticas de empresa, haciendo que hayamos tenido que cambiar de proyecto a uno totalmente diferente del que teníamos en mente en un principio.
+<hr>
 
 ### Mantenimiento:
 <hr>
