@@ -9,7 +9,7 @@ Bienvenid@ al readme de nuestro proyecto, la temática de nuestro proyecto consi
 
 En segundo lugar, en cuanto a los usuarios que podrán encontrarse en la web encontramos principalmente al usuario base, el cual consulta la web de manera informativa y sin permisos de cambiar nada, en cuanto al otro usuario (administrador) este al identificarse en la web tendrá la capacidad exclusiva de regenerar las noticias del día.
 
-En cuanto a los requisitos de la web, en primer lugar necesitamos que el usuario final tenga acceso a las noticias generadas, y en segundo lugar, que el servidor regenere las noticias diariamente de manera automática. Y en tercer lugar, que muestre un mensaje nuevo cada día, y que se regenere automáticamente.
+En cuanto a los requisitos de la web, en primer lugar necesitamos que el usuario final tenga acceso a las noticias generadas,  en segundo lugar, que el servidor regenere las noticias diariamente de manera automática. En tercer lugar, que muestre un mensaje nuevo cada día, y que se regenere automáticamente.
 
 <hr>
 
@@ -19,7 +19,7 @@ En cuanto a los requisitos de la web, en primer lugar necesitamos que el usuario
 
 Para este proyecto, vamos a usar la arquitectura cliente-servidor, permitiendo así la comunicación entre usuario y la página web alojada en el servidor de GitHub Pages.
 
-En la fase de diseño definimos a los usuarios, encontramos que se divide en 2 ramas, el primero sería el usuario base, el cual no puede modificar ningún aspecto de la página ni modificar ningún dato del servidor y en segundo lugar tenemos al administrador, este sí que puede hacer cambios/modificaciones en la página web, teniendo un botón para regenerar las noticias del día. 
+En la fase de diseño definimos a los usuarios, encontramos que se divide en 2 ramas, el primero sería el usuario base, el cual no puede modificar ningún aspecto de la página, ni modificar ningún dato del servidor y en segundo lugar tenemos al administrador, este sí que puede hacer cambios/modificaciones en la página web, teniendo un botón para regenerar las noticias del día. 
 Respecto al servidor, este, recibirá las solicitudes de los usuarios y otorgará una respuesta en función del tipo de usuario que se esté comunicando con él.
 
 Para desarrollar la página web de noticias usamos las siguientes APIs: NewsApi, Gemini y una API de Google para que la tipografía de web sea fuente Roboto. Además, nos  apoyamos en ChatGPT Plus, Gemini y Claude, para potenciar, mejorar y desarrollar el diseño de la página, así como interconectividad de APIs. Finalmente, para que la página hiciera consultas a las APIs, usamos Deno DePloy y Cloudflare a modo de proxy (por alguna razón una parte de lo que teníamos en Cloudflare dejo de funcionar y tuvimos que traspasar esa parte a Deno DePloy). 
@@ -29,7 +29,7 @@ Para desarrollar la página web de noticias usamos las siguientes APIs: NewsApi,
 ### Despliegue:
 <hr>
 
-cada vez que quieres hacer una consulta a la API, el deploy tarda aproximadamente 30 segundos. A la hora de hacer el deploy hay muchos factores que pueden generar errores, sobre todo en lo que se refiere al workflow y hacer funcionar las API keys de manera segura, esto puede llegar a ser frustrante y apoteósico, puesto que llega un momento en el que se pruebe lo que se pruebe acaba dando error. Además, la gestión de los workflows de GitHub es confusa y liosa, haciendo que para algunos propósitos sea más útil emplear una proxy o servidor externo para conseguir lo que queremos.
+Cada vez que quieres hacer una consulta a la API, el deploy tarda aproximadamente 30 segundos. A la hora de hacer el deploy hay muchos factores que pueden generar errores, sobre todo en lo que se refiere al workflow y hacer funcionar las API keys de manera segura, esto puede llegar a ser frustrante y apoteósico, puesto que llega un momento en el que se pruebe lo que se pruebe acaba dando error. Además, la gestión de los workflows de GitHub es confusa, haciendo que para algunos propósitos sea más útil emplear una proxy o servidor externo para conseguir lo que queremos.
 <hr>
 
 ### Mantenimiento:
@@ -56,17 +56,17 @@ Más adelante, una vez ya teníamos la interconexión de apis (newsAPI y Gemini)
 #### Responsive
 <hr>
 
-Nuestra web solo se muestra correctamente si entramos desde una pantalla de escritorio, es decir, al entrar desde un smartphone o una tablet la web se ve mal y esto sería importante mejorarlo para que todos los que accedan a la web puedan disfrutar de una buena experiencia de usuario
+Nuestra web solo se muestra correctamente si entramos desde una pantalla de escritorio, es decir, al entrar desde un smartphone o una tablet la web se ve mal y esto sería importante mejorarlo para que todos los que accedan a la web puedan disfrutar de una buena experiencia de usuario.
 
 #### Links erróneos
 <hr>
 
-Esta mejora se origina del problema de que cuando usamos la vista de admin y regeneramos una noticia, los botones de dirección a cada noticia (1, 2, 3, 4 ,5) dejan de funcionar correctamente debido a que el orden de los divs y sus respectivos id no es el indicado en cada botón para dirigirse a la respectiva noticia
+Esta mejora se origina del problema de que cuando usamos la vista de admin y regeneramos una noticia, los botones de dirección a cada noticia (1, 2, 3, 4 ,5) dejan de funcionar correctamente debido a que el orden de los divs y sus respectivos id, no es el indicado en cada botón para dirigirse a la respectiva noticia.
 
 #### Modo admin de verdad
 <hr>
 
-El modo admin que tenemos implementado solamente elimina divs y muestra el siguiente dentro de la lista. El problema es que este cambio no solo no es permanente, sino que además ocurre solo a nivel local, sería correcto trabajar en hacer que los cambios sean universales y permanentes hasta que las noticias se actualicen
+El modo admin que tenemos implementado solamente elimina divs y muestra el siguiente dentro de la lista. El problema es que este cambio no solo no es permanente, sino que además ocurre solo a nivel local, sería correcto trabajar en hacer que los cambios sean universales y permanentes hasta que las noticias se actualicen.
 
 #### Imágenes sin mutilar
 <hr>
